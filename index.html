@@ -430,11 +430,11 @@
                     { id: 3, name: 'Sarah K.', email: 'sarah@street.com', category: 'Streetwear', rating: 4.5, reviews: 89 }
                 ],
                 products: [
-                    { id: 1, vendorId: 2, name: 'Oud Noir', price: 89.90, desc: 'Parfum oriental luxueux aux notes de bois précieux', image: '', rating: 4.9, reviews: 42, stock: 15 },
-                    { id: 2, vendorId: 2, name: 'Ambre Royal', price: 69.90, desc: 'Fragrance chaude et boisée à l\'ambre gris', image: '', rating: 4.7, reviews: 38, stock: 8 },
-                    { id: 3, vendorId: 3, name: 'Hoodie Oversize', price: 59.90, desc: 'Sweat streetwear coupe large en coton bio', image: '', rating: 4.6, reviews: 27, stock: 3 },
-                    { id: 4, vendorId: 3, name: 'Casquette Snapback', price: 29.90, desc: 'Casquette tendance brodée main', image: '', rating: 4.3, reviews: 19, stock: 0 },
-                    { id: 5, vendorId: 1, name: 'Sweat Édition Limitée', price: 79.90, desc: 'Collection exclusive SHOPPRO en édition limitée', image: '', rating: 4.9, reviews: 63, stock: 5 }
+                    { id: 1, vendorId: 2, name: 'Oud Noir', price: 89.90, desc: 'Parfum oriental luxueux aux notes de bois précieux', image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&h=400&fit=crop', rating: 4.9, reviews: 42, stock: 15 },
+                    { id: 2, vendorId: 2, name: 'Ambre Royal', price: 69.90, desc: 'Fragrance chaude et boisée à l\'ambre gris', image: 'https://images.unsplash.com/photo-1585386959984-415bd4fad4c8?w=400&h=400&fit=crop', rating: 4.7, reviews: 38, stock: 8 },
+                    { id: 3, vendorId: 3, name: 'Hoodie Oversize', price: 59.90, desc: 'Sweat streetwear coupe large en coton bio', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop', rating: 4.6, reviews: 27, stock: 3 },
+                    { id: 4, vendorId: 3, name: 'Casquette Snapback', price: 29.90, desc: 'Casquette tendance brodée main', image: 'https://images.unsplash.com/photo-1535982330050-f1c2fb79ff78?w=400&h=400&fit=crop', rating: 4.3, reviews: 19, stock: 0 },
+                    { id: 5, vendorId: 1, name: 'Sweat Édition Limitée', price: 79.90, desc: 'Collection exclusive SHOPPRO en édition limitée', image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=400&fit=crop', rating: 4.9, reviews: 63, stock: 5 }
                 ],
                 orders: [
                     { id: 101, productId: 1, productName: 'Oud Noir', price: 89.90, date: '2026-08-22 15:30', buyer: 'client@mail.com', buyerName: 'Client Test', buyerAddress: '15 avenue des Champs, 75008 Paris', buyerPhone: '06 98 76 54 32', vendorId: 2, status: 'completed', paymentMethod: 'card' },
@@ -466,7 +466,7 @@
         }
 
         function getDefaultImage() {
-            return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f1f5f9"/><text x="100" y="110" text-anchor="middle" font-family="Arial" font-size="20" fill="#94a3b8">📦</text></svg>');
+            return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop';
         }
 
         function showToast(message, type = 'success') {
