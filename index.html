@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ===== RESET & BASE ===== */
         *{margin:0;padding:0;box-sizing:border-box}
         :root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;--bg:#f1f5f9;--white:#ffffff;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--radius:16px;--shadow:0 1px 3px rgba(0,0,0,0.06);--shadow-lg:0 10px 40px rgba(0,0,0,0.08)}
         body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--gray-800);min-height:100vh;-webkit-tap-highlight-color:transparent}
@@ -15,7 +14,6 @@
         a{text-decoration:none;color:inherit}
         .app{max-width:1280px;margin:0 auto;padding:0.8rem 1rem 3rem}
         .hidden{display:none!important}
-        /* ===== HEADER ===== */
         .header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;background:var(--white);padding:0.5rem 1rem;border-radius:var(--radius);border:1px solid var(--gray-200);box-shadow:var(--shadow);margin-bottom:1rem;position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px)}
         .logo{font-size:1.2rem;font-weight:800;display:flex;align-items:center;gap:0.3rem;color:var(--gray-900)}
         .logo span{color:var(--primary)}
@@ -45,14 +43,12 @@
         .btn-outline{border:1.5px solid var(--gray-300);color:var(--gray-600);background:transparent}
         .btn-outline:hover{border-color:var(--primary);color:var(--primary)}
         .btn-block{width:100%;justify-content:center;padding:0.5rem;font-size:0.8rem}
-        /* ===== FILTRES ===== */
         .filters{display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:1rem;padding:0.4rem 0.8rem;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);overflow-x:auto;-webkit-overflow-scrolling:touch}
         .filters .filter-btn{padding:0.2rem 0.8rem;border-radius:40px;font-weight:500;font-size:0.7rem;color:var(--gray-500);border:1px solid transparent;transition:0.2s;white-space:nowrap;flex-shrink:0}
         .filters .filter-btn:hover{background:var(--gray-100);color:var(--gray-700)}
         .filters .filter-btn.active{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
         .filters .filter-btn .count{background:var(--gray-200);padding:0.02rem 0.3rem;border-radius:40px;font-size:0.55rem;margin-left:0.2rem}
         .filters .filter-btn.active .count{background:var(--primary);color:white}
-        /* ===== PRODUITS ===== */
         .section-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.8rem}
         .section-header h2{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:0.3rem}
         .section-header h2 i{color:var(--primary)}
@@ -79,7 +75,6 @@
         .product-card .body .product-owner{margin-top:0.2rem;font-size:0.55rem;color:var(--gray-400);display:flex;align-items:center;gap:0.2rem}
         .empty-state{grid-column:1/-1;text-align:center;padding:2rem 1rem;color:var(--gray-400);background:var(--white);border-radius:var(--radius);border:2px dashed var(--gray-200)}
         .empty-state i{font-size:2rem;display:block;margin-bottom:0.3rem;opacity:0.4}
-        /* ===== POPUPS ===== */
         .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(12px);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.3s ease;padding:0.8rem}
         .popup-overlay.active{opacity:1;visibility:visible}
         .popup-content{background:var(--white);border-radius:20px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:1.2rem;transform:scale(0.9) translateY(20px);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.3)}
@@ -91,7 +86,6 @@
         .popup-content::-webkit-scrollbar{width:4px}
         .popup-content::-webkit-scrollbar-track{background:var(--gray-100);border-radius:10px}
         .popup-content::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:10px}
-        /* ===== PANELS ===== */
         .panel{background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--gray-200);padding:0.8rem 1rem;margin-bottom:0.8rem}
         .panel .panel-title{font-size:0.85rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;margin-bottom:0.6rem}
         .panel .panel-title i{color:var(--primary)}
@@ -103,7 +97,6 @@
         .form-group textarea{border-radius:var(--radius);resize:vertical;min-height:40px}
         .form-group input[type="file"]{padding:0.3rem;border-radius:var(--radius);border:2px dashed var(--gray-300);background:var(--gray-50);color:var(--gray-500);font-size:0.7rem}
         .form-group input[type="file"]::file-selector-button{padding:0.2rem 0.8rem;border-radius:40px;border:none;background:var(--primary);color:white;font-weight:600;font-size:0.65rem;margin-right:0.5rem;cursor:pointer}
-        /* ===== LISTES ===== */
         .list{display:flex;flex-direction:column;gap:0.3rem}
         .list-item{display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0.6rem;background:var(--white);border-radius:40px;border:1px solid var(--gray-200);flex-wrap:wrap;gap:0.2rem;font-size:0.75rem}
         .list-item .info{display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap}
@@ -118,12 +111,13 @@
         .history-item:last-child{border-bottom:none}
         .history-item .details{display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap}
         .history-item .details .date{color:var(--gray-400);font-size:0.6rem}
-        .status-badge{font-size:0.5rem;font-weight:700;padding:0.05rem 0.4rem;border-radius:40px;background:#dcfce7;color:#16a34a}
+        .status-badge{font-size:0.5rem;font-weight:700;padding:0.05rem 0.4rem;border-radius:40px}
+        .status-badge.completed{background:#dcfce7;color:#16a34a}
         .status-badge.pending{background:#fef3c7;color:#d97706}
+        .status-badge.cancelled{background:#fee2e2;color:var(--red)}
         .buyer-info{font-size:0.6rem;color:var(--gray-500);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center}
         .buyer-info i{color:var(--primary);font-size:0.5rem}
         .order-details{font-size:0.6rem;color:var(--gray-600);background:var(--gray-50);padding:0.2rem 0.5rem;border-radius:8px;margin-left:0.2rem}
-        /* ===== MODALS ===== */
         .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1100;opacity:0;visibility:hidden;transition:all 0.3s ease;padding:0.8rem}
         .modal-overlay.active{opacity:1;visibility:visible}
         .modal-box{background:var(--white);max-width:420px;width:100%;padding:1.5rem;border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;transform:scale(0.9);transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
@@ -150,24 +144,20 @@
         .order-history-item .oh-top .oh-price{color:var(--primary);font-weight:700}
         .order-history-item .oh-bottom{font-size:0.6rem;color:var(--gray-500);display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.1rem}
         .order-history-item .oh-bottom i{color:var(--primary)}
-        /* ===== IMAGE ZOOM ===== */
         .image-zoom{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.3s ease;cursor:pointer;padding:1rem}
         .image-zoom.active{opacity:1;visibility:visible}
         .image-zoom img{max-width:95%;max-height:90vh;object-fit:contain;border-radius:8px;transform:scale(0.8);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1)}
         .image-zoom.active img{transform:scale(1)}
         .image-zoom .zoom-close{position:absolute;top:20px;right:20px;color:white;font-size:2rem;opacity:0.7;transition:0.2s;background:none;border:none}
         .image-zoom .zoom-close:hover{opacity:1;transform:rotate(90deg)}
-        /* ===== TOAST ===== */
         .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--gray-900);color:white;padding:0.6rem 1.2rem;border-radius:var(--radius);font-weight:500;font-size:0.8rem;box-shadow:var(--shadow-lg);z-index:2000;max-width:90%;animation:slideUp 0.3s ease;text-align:center}
         .toast.success{background:var(--green)}
         .toast.error{background:var(--red)}
         .toast.warning{background:var(--orange)}
         @keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-        /* ===== COOKIE ===== */
         .cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--gray-900);color:white;padding:0.8rem 1rem;box-shadow:var(--shadow-lg);z-index:3000;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:center;text-align:center}
         .cookie-banner p{font-size:0.75rem;flex:1}
         .cookie-banner .btn{font-size:0.7rem;padding:0.3rem 1rem}
-        /* ===== VENDEUR CARD ===== */
         .vendor-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);padding:0.6rem 0.8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
         .vendor-card .vendor-info{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
         .vendor-card .vendor-info .v-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem}
@@ -181,18 +171,14 @@
         .product-preview .p-info{flex:1;font-size:0.7rem}
         .product-preview .p-info .p-name{font-weight:600}
         .product-preview .p-info .p-price{color:var(--primary);font-weight:700}
-        /* ===== ADRESSE ===== */
         .address-group{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem}
         .address-group .form-group{flex:1 0 auto}
-        /* ===== RESPONSIVE ===== */
         @media(max-width:600px){.product-grid{grid-template-columns:repeat(2,1fr);gap:0.6rem}.product-card .image{height:140px}.popup-content{padding:0.8rem;max-width:100%}.stats-grid{grid-template-columns:repeat(2,1fr)}.form-group{flex:1 0 100%}.address-group{grid-template-columns:1fr}}
         @media(max-width:400px){.product-grid{grid-template-columns:1fr 1fr;gap:0.4rem}.product-card .image{height:120px}.header{padding:0.3rem 0.5rem}.nav a{font-size:0.6rem;padding:0.1rem 0.4rem}}
-        /* ===== PAIEMENT ===== */
         .payment-method{display:flex;gap:0.5rem;flex-wrap:wrap;margin:0.3rem 0}
         .payment-method label{display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;font-weight:500;padding:0.2rem 0.6rem;border-radius:40px;border:1.5px solid var(--gray-200);cursor:pointer;transition:0.2s}
         .payment-method label:hover{border-color:var(--primary)}
         .payment-method input[type="radio"]{accent-color:var(--primary)}
-        /* ===== MESSAGERIE ===== */
         .message-thread{max-height:300px;overflow-y:auto;margin-bottom:0.5rem;border:1px solid var(--gray-200);border-radius:var(--radius);padding:0.3rem;background:var(--white)}
         .message-thread .msg{display:flex;flex-direction:column;margin-bottom:0.2rem;padding:0.2rem 0.5rem;border-radius:8px;font-size:0.7rem}
         .msg.sent{background:var(--primary-light);align-items:flex-end;border-bottom-right-radius:0}
@@ -213,6 +199,13 @@
         .msg-notif-badge .badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:white;font-size:0.45rem;font-weight:700;padding:0.02rem 0.3rem;border-radius:40px;border:2px solid white}
         .msg-btn{background:var(--primary);color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:0.7rem}
         .msg-btn:hover{background:var(--primary-dark)}
+        .order-action-btn{font-size:0.5rem;padding:0.05rem 0.4rem;border-radius:40px;font-weight:600}
+        .notification-badge{position:relative}
+        .notification-badge .badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:white;font-size:0.45rem;font-weight:700;padding:0.02rem 0.3rem;border-radius:40px;border:2px solid white}
+        .notif-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.5rem;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);margin-bottom:0.2rem;font-size:0.7rem}
+        .notif-item .notif-icon{color:var(--primary);font-size:0.8rem}
+        .notif-item .notif-time{font-size:0.55rem;color:var(--gray-400);margin-left:auto}
+        .notif-item.unread{background:var(--primary-light);border-color:var(--primary)}
     </style>
 </head>
 <body>
@@ -225,6 +218,7 @@
             <a href="#" id="navDashboard" class="hidden"><i class="fas fa-chart-pie"></i> Admin</a>
             <a href="#" id="navMyShop" class="hidden"><i class="fas fa-store"></i> Ma boutique</a>
             <a href="#" id="navMessages" class="hidden"><i class="fas fa-envelope"></i> Messages <span id="msgNavBadge" class="hidden" style="background:var(--red);color:white;font-size:0.5rem;padding:0.02rem 0.3rem;border-radius:40px;">0</span></a>
+            <a href="#" id="navNotifications" class="hidden"><i class="fas fa-bell"></i> <span id="notifNavBadge" class="hidden" style="background:var(--red);color:white;font-size:0.5rem;padding:0.02rem 0.3rem;border-radius:40px;">0</span></a>
         </nav>
         <div class="user-section" id="userSection">
             <div class="avatar" id="userAvatar">👤<span class="online-dot" id="onlineDot"></span></div>
@@ -354,6 +348,15 @@
         </div>
     </div>
 
+    <!-- POPUP NOTIFICATIONS -->
+    <div id="popupNotifications" class="popup-overlay">
+        <div class="popup-content">
+            <button class="popup-close" id="closePopupNotifications"><i class="fas fa-times"></i></button>
+            <div class="popup-title"><i class="fas fa-bell"></i> Notifications</div>
+            <div id="notificationsList" class="panel" style="padding:0.4rem;"></div>
+        </div>
+    </div>
+
     <!-- MODAL CONNEXION / INSCRIPTION -->
     <div id="authModal" class="modal-overlay">
         <div class="modal-box">
@@ -452,7 +455,7 @@
 
         // ===== DATA =====
         function loadData() {
-            const raw = localStorage.getItem('shoppro_data_v12');
+            const raw = localStorage.getItem('shoppro_data_v13');
             if (raw) { try { return JSON.parse(raw) } catch(e) {} }
             return {
                 users: [
@@ -487,16 +490,21 @@
                     { id: 3, from: 'client@mail.com', to: 'jean@parfums.com', content: 'Super, je prends !', date: '2026-08-23 09:30', read: false },
                     { id: 4, from: 'client@mail.com', to: 'sarah@street.com', content: 'Bonjour, le hoodie existe-t-il en taille XL ?', date: '2026-08-23 11:00', read: false }
                 ],
+                notifications: [
+                    { id: 1, userId: 'client@mail.com', type: 'order', message: 'Votre commande "Oud Noir" a été acceptée par le vendeur.', date: '2026-08-22 16:00', read: false },
+                    { id: 2, userId: 'client@mail.com', type: 'order', message: 'Votre commande "Hoodie Oversize" est en attente de validation.', date: '2026-08-23 10:30', read: false }
+                ],
                 currentUser: null,
                 currentFilter: 'all',
                 nextId: 6,
                 nextOrderId: 103,
-                nextMsgId: 5
+                nextMsgId: 5,
+                nextNotifId: 3
             }
         }
         let data = loadData();
 
-        function saveData() { localStorage.setItem('shoppro_data_v12', JSON.stringify(data)) }
+        function saveData() { localStorage.setItem('shoppro_data_v13', JSON.stringify(data)) }
 
         // ===== UTILS =====
         function fileToBase64(file) {
@@ -557,6 +565,89 @@
             if (filter === 'all') return '';
             return `· ${filter}`;
         }
+        function getOrderStatusLabel(status) {
+            const labels = {
+                'pending': '⏳ En attente',
+                'completed': '✅ Validée',
+                'cancelled': '❌ Annulée'
+            };
+            return labels[status] || status;
+        }
+
+        // ===== NOTIFICATIONS =====
+        function addNotification(userId, type, message) {
+            data.notifications.push({
+                id: data.nextNotifId++,
+                userId: userId,
+                type: type,
+                message: message,
+                date: new Date().toLocaleString('fr-FR', { hour12: false }),
+                read: false
+            });
+            saveData();
+        }
+
+        function getUnreadNotifications(userEmail) {
+            return data.notifications.filter(n => n.userId === userEmail && !n.read);
+        }
+
+        function markNotificationAsRead(id) {
+            const notif = data.notifications.find(n => n.id === id);
+            if (notif) notif.read = true;
+            saveData();
+        }
+
+        function markAllNotificationsAsRead(userEmail) {
+            data.notifications.forEach(n => { if (n.userId === userEmail) n.read = true });
+            saveData();
+        }
+
+        function renderNotifications() {
+            const user = data.currentUser;
+            if (!user) return;
+            const list = document.getElementById('notificationsList');
+            list.innerHTML = '';
+            const notifs = data.notifications.filter(n => n.userId === user.email).sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (notifs.length === 0) {
+                list.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;font-size:0.75rem;">Aucune notification</div>`;
+                return;
+            }
+            notifs.forEach(n => {
+                const div = document.createElement('div');
+                div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+                div.innerHTML = `
+                    <span class="notif-icon"><i class="fas ${n.type === 'order' ? 'fa-shopping-cart' : 'fa-info-circle'}"></i></span>
+                    <span>${n.message}</span>
+                    <span class="notif-time">${n.date}</span>
+                    ${!n.read ? `<button class="btn btn-sm btn-primary" data-id="${n.id}">Marquer lu</button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+            document.querySelectorAll('#notificationsList .btn-primary').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    markNotificationAsRead(parseInt(this.dataset.id));
+                    renderAll();
+                    renderNotifications();
+                });
+            });
+        }
+
+        function updateNotifBadge() {
+            const badge = document.getElementById('notifNavBadge');
+            const user = data.currentUser;
+            if (user) {
+                const unread = getUnreadNotifications(user.email).length;
+                if (unread > 0) {
+                    badge.classList.remove('hidden');
+                    badge.textContent = unread;
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
 
         // ===== MESSAGERIE =====
         function getConversations(userEmail) {
@@ -592,7 +683,6 @@
             });
             saveData();
             renderAll();
-            // Si la fenêtre de messagerie est ouverte, on met à jour l'affichage
             if (document.getElementById('popupMessages').classList.contains('active')) {
                 renderConversations();
                 if (document.getElementById('messageThreadContainer').classList.contains('hidden') === false) {
@@ -693,6 +783,47 @@
             }
         }
 
+        // ===== ORDER MANAGEMENT =====
+        function approveOrder(orderId) {
+            const order = data.orders.find(o => o.id === orderId);
+            if (!order) return showToast('Commande introuvable', 'error');
+            if (order.status !== 'pending') return showToast('Cette commande a déjà été traitée', 'warning');
+            order.status = 'completed';
+            // Notifier l'acheteur
+            addNotification(order.buyer, 'order', `Votre commande "${order.productName}" a été acceptée et est maintenant validée.`);
+            // Notifier l'admin
+            addNotification('admin@shop.com', 'order', `La commande "${order.productName}" de ${order.buyerName} a été validée.`);
+            data.activities.unshift({
+                user: data.currentUser?.name || 'Admin',
+                action: `a validé la commande "${order.productName}" de ${order.buyerName}`,
+                time: 'À l\'instant',
+                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'A'
+            });
+            saveData();
+            renderAll();
+            showToast(`✅ Commande "${order.productName}" validée ! L'acheteur a été notifié.`);
+        }
+
+        function cancelOrder(orderId) {
+            const order = data.orders.find(o => o.id === orderId);
+            if (!order) return showToast('Commande introuvable', 'error');
+            if (order.status === 'cancelled') return showToast('Commande déjà annulée', 'warning');
+            order.status = 'cancelled';
+            // Rendre le stock
+            const product = data.products.find(p => p.id === order.productId);
+            if (product) product.stock++;
+            addNotification(order.buyer, 'order', `Votre commande "${order.productName}" a été annulée.`);
+            data.activities.unshift({
+                user: data.currentUser?.name || 'Admin',
+                action: `a annulé la commande "${order.productName}" de ${order.buyerName}`,
+                time: 'À l\'instant',
+                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'A'
+            });
+            saveData();
+            renderAll();
+            showToast(`❌ Commande "${order.productName}" annulée.`);
+        }
+
         // ===== POPUPS / MODALS =====
         function openPopup(type) {
             if (type === 'admin') { document.getElementById('popupAdmin').classList.add('active'); document.body.style.overflow = 'hidden' }
@@ -703,12 +834,20 @@
                 renderConversations();
                 backToConversations();
                 updateMsgNavBadge();
+            } else if (type === 'notifications') {
+                document.getElementById('popupNotifications').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                renderNotifications();
+                markAllNotificationsAsRead(data.currentUser.email);
+                updateNotifBadge();
+                renderAll();
             }
         }
         function closePopup(type) {
             if (type === 'admin') { document.getElementById('popupAdmin').classList.remove('active'); document.body.style.overflow = '' }
             else if (type === 'vendor') { document.getElementById('popupMyShop').classList.remove('active'); document.body.style.overflow = '' }
             else if (type === 'messages') { document.getElementById('popupMessages').classList.remove('active'); document.body.style.overflow = '' }
+            else if (type === 'notifications') { document.getElementById('popupNotifications').classList.remove('active'); document.body.style.overflow = '' }
         }
 
         function openImageZoom(src) {
@@ -790,6 +929,7 @@
                         ${isInStock ? `<button class="btn btn-primary btn-sm buy-btn" data-id="${p.id}"><i class="fas fa-shopping-cart"></i></button>` : `<button class="btn btn-outline btn-sm" disabled><i class="fas fa-times"></i></button>`}
                         <button class="btn btn-warning btn-sm review-btn" data-id="${p.id}"><i class="fas fa-star"></i></button>
                         ${vendor ? `<button class="btn btn-primary btn-sm msg-btn" data-vendor="${vendor.email}" data-product="${p.name}"><i class="fas fa-envelope"></i></button>` : ''}
+                        ${data.currentUser && data.currentUser.role === 'admin' ? `<button class="btn btn-primary btn-sm msg-btn" data-vendor="admin@shop.com" data-product="${p.name}"><i class="fas fa-envelope"></i></button>` : ''}
                         ${canDelete ? `<button class="btn btn-danger btn-sm del-product" data-id="${p.id}"><i class="fas fa-trash"></i></button>` : ''}
                         ${canDelete ? `<button class="btn btn-primary btn-sm edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>` : ''}
                     </div>
@@ -833,7 +973,6 @@
                     openPopup('messages');
                     const otherUser = getUserByEmail(vendorEmail);
                     const name = otherUser ? otherUser.name : vendorEmail;
-                    // On ouvre la conversation avec ce vendeur
                     setTimeout(() => {
                         markAsRead(data.currentUser.email, vendorEmail);
                         renderAll();
@@ -877,7 +1016,7 @@
                         <div class="vendor-info">
                             <div class="v-avatar">${v.name.charAt(0).toUpperCase()}</div>
                             <div>
-                                <div class="v-name">${v.name} <span class="badge-vendor">${v.category || 'Général'}</span></div>
+                                <div class="v-name">${v.name} <span class="v-category">${v.category || 'Général'}</span></div>
                                 <div class="v-email">${v.email}</div>
                             </div>
                         </div>
@@ -939,7 +1078,6 @@
                 const sorted = [...data.orders].sort((a, b) => new Date(b.date) - new Date(a.date));
                 for (let o of sorted) {
                     const vendor = getVendor(o.vendorId);
-                    const buyer = getUserByEmail(o.buyer);
                     const div = document.createElement('div');
                     div.className = 'history-item';
                     div.innerHTML = `
@@ -950,10 +1088,26 @@
                             ${vendor ? `<span style="font-size:0.6rem;color:var(--gray-400);">🏪 ${vendor.name}</span>` : ''}
                             <span class="buyer-info"><i class="fas fa-user"></i> ${o.buyerName || o.buyer} <i class="fas fa-phone"></i> ${o.buyerPhone || 'N/C'} <i class="fas fa-map-marker-alt"></i> ${o.buyerAddress || 'N/C'}</span>
                         </div>
-                        <span class="status-badge ${o.status === 'pending' ? 'pending' : ''}">${o.status === 'pending' ? '⏳ En attente' : '✅ Validée'}</span>
+                        <div style="display:flex;align-items:center;gap:0.3rem;">
+                            <span class="status-badge ${o.status}">${getOrderStatusLabel(o.status)}</span>
+                            ${o.status === 'pending' ? `
+                                <button class="btn btn-success btn-sm order-action-btn approve-order" data-id="${o.id}">✅ Accepter</button>
+                                <button class="btn btn-danger btn-sm order-action-btn cancel-order" data-id="${o.id}">❌ Annuler</button>
+                            ` : ''}
+                        </div>
                     `;
                     historyList.appendChild(div);
                 }
+                document.querySelectorAll('.approve-order').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        approveOrder(parseInt(this.dataset.id));
+                    });
+                });
+                document.querySelectorAll('.cancel-order').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (confirm('Annuler cette commande ?')) cancelOrder(parseInt(this.dataset.id));
+                    });
+                });
             }
         }
 
@@ -1023,10 +1177,26 @@
                                 ${o.paymentMethod === 'card' ? '💳 Carte' : '💵 Espèces'}
                             </div>
                         </div>
-                        <span class="status-badge ${o.status === 'pending' ? 'pending' : ''}">${o.status === 'pending' ? '⏳ En attente' : '✅ Validée'}</span>
+                        <div style="display:flex;align-items:center;gap:0.3rem;">
+                            <span class="status-badge ${o.status}">${getOrderStatusLabel(o.status)}</span>
+                            ${o.status === 'pending' ? `
+                                <button class="btn btn-success btn-sm order-action-btn vendor-approve" data-id="${o.id}">✅ Accepter</button>
+                                <button class="btn btn-danger btn-sm order-action-btn vendor-cancel" data-id="${o.id}">❌ Refuser</button>
+                            ` : ''}
+                        </div>
                     `;
                     ordersList.appendChild(div);
                 }
+                document.querySelectorAll('.vendor-approve').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        approveOrder(parseInt(this.dataset.id));
+                    });
+                });
+                document.querySelectorAll('.vendor-cancel').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (confirm('Refuser cette commande ?')) cancelOrder(parseInt(this.dataset.id));
+                    });
+                });
             }
         }
 
@@ -1053,8 +1223,11 @@
                     <div class="oh-bottom">
                         <span><i class="fas fa-store"></i> ${vendor ? vendor.name : 'SHOPPRO'}</span>
                         <span><i class="fas fa-calendar"></i> ${o.date}</span>
-                        <span class="status-badge ${o.status === 'pending' ? 'pending' : ''}">${o.status === 'pending' ? '⏳ En cours' : '✅ Livrée'}</span>
+                        <span class="status-badge ${o.status}">${getOrderStatusLabel(o.status)}</span>
                         <span><i class="fas fa-credit-card"></i> ${o.paymentMethod === 'card' ? 'Carte' : 'Espèces'}</span>
+                        ${o.status === 'completed' ? '<span style="color:var(--green);"><i class="fas fa-check-circle"></i> Livrée</span>' : ''}
+                        ${o.status === 'pending' ? '<span style="color:var(--orange);"><i class="fas fa-clock"></i> En attente de validation</span>' : ''}
+                        ${o.status === 'cancelled' ? '<span style="color:var(--red);"><i class="fas fa-times-circle"></i> Annulée</span>' : ''}
                     </div>
                 `;
                 container.appendChild(div);
@@ -1069,6 +1242,7 @@
             renderProfileOrders();
             updateNav();
             updateMsgNavBadge();
+            updateNotifBadge();
             saveData();
         }
 
@@ -1082,6 +1256,7 @@
             const navDashboard = document.getElementById('navDashboard');
             const navMyShop = document.getElementById('navMyShop');
             const navMessages = document.getElementById('navMessages');
+            const navNotifications = document.getElementById('navNotifications');
 
             if (user) {
                 const displayName = user.name || user.email.split('@')[0];
@@ -1089,6 +1264,7 @@
                 userAvatarEl.innerHTML = `${displayName.charAt(0).toUpperCase()}<span class="online-dot" id="onlineDot"></span>`;
                 authBtnEl.textContent = '';
                 navMessages.classList.remove('hidden');
+                navNotifications.classList.remove('hidden');
                 if (user.role === 'admin') {
                     roleBadgeEl.textContent = 'admin';
                     roleBadgeEl.className = 'badge-role admin';
@@ -1114,9 +1290,11 @@
                 navDashboard.classList.add('hidden');
                 navMyShop.classList.add('hidden');
                 navMessages.classList.add('hidden');
+                navNotifications.classList.add('hidden');
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('messages');
+                closePopup('notifications');
             }
         }
 
@@ -1247,6 +1425,15 @@
                 time: 'À l\'instant',
                 avatar: buyer.name?.charAt(0).toUpperCase() || 'C'
             });
+            // Notification à l'acheteur
+            addNotification(buyer.email, 'order', `Votre commande "${product.name}" a été passée. En attente de validation par le vendeur.`);
+            // Notification au vendeur
+            if (vendor) {
+                addNotification(vendor.email, 'order', `Nouvelle commande de ${buyer.name} pour "${product.name}" (${product.price.toFixed(2)} €).`);
+            }
+            // Notification à l'admin
+            addNotification('admin@shop.com', 'order', `Nouvelle commande de ${buyer.name} pour "${product.name}" (${product.price.toFixed(2)} €).`);
+
             document.getElementById('paymentModal').classList.remove('active');
             pendingProductId = null;
             renderAll();
@@ -1495,6 +1682,7 @@
             closePopup('admin');
             closePopup('vendor');
             closePopup('messages');
+            closePopup('notifications');
             renderAll();
             showToast('👋 Déconnexion');
         }
@@ -1553,10 +1741,12 @@
             closePopup('admin');
             closePopup('vendor');
             closePopup('messages');
+            closePopup('notifications');
             document.getElementById('navHome').classList.add('active');
             document.getElementById('navDashboard').classList.remove('active');
             document.getElementById('navMyShop').classList.remove('active');
             document.getElementById('navMessages').classList.remove('active');
+            document.getElementById('navNotifications').classList.remove('active');
             renderAll();
         });
 
@@ -1566,11 +1756,13 @@
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('messages');
+                closePopup('notifications');
                 openPopup('admin');
                 document.getElementById('navDashboard').classList.add('active');
                 document.getElementById('navHome').classList.remove('active');
                 document.getElementById('navMyShop').classList.remove('active');
                 document.getElementById('navMessages').classList.remove('active');
+                document.getElementById('navNotifications').classList.remove('active');
                 renderAll();
             }
         });
@@ -1581,11 +1773,13 @@
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('messages');
+                closePopup('notifications');
                 openPopup('vendor');
                 document.getElementById('navMyShop').classList.add('active');
                 document.getElementById('navHome').classList.remove('active');
                 document.getElementById('navDashboard').classList.remove('active');
                 document.getElementById('navMessages').classList.remove('active');
+                document.getElementById('navNotifications').classList.remove('active');
                 renderAll();
             }
         });
@@ -1595,11 +1789,29 @@
             if (data.currentUser) {
                 closePopup('admin');
                 closePopup('vendor');
+                closePopup('notifications');
                 openPopup('messages');
                 document.getElementById('navMessages').classList.add('active');
                 document.getElementById('navHome').classList.remove('active');
                 document.getElementById('navDashboard').classList.remove('active');
                 document.getElementById('navMyShop').classList.remove('active');
+                document.getElementById('navNotifications').classList.remove('active');
+                renderAll();
+            }
+        });
+
+        document.getElementById('navNotifications').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (data.currentUser) {
+                closePopup('admin');
+                closePopup('vendor');
+                closePopup('messages');
+                openPopup('notifications');
+                document.getElementById('navNotifications').classList.add('active');
+                document.getElementById('navHome').classList.remove('active');
+                document.getElementById('navDashboard').classList.remove('active');
+                document.getElementById('navMyShop').classList.remove('active');
+                document.getElementById('navMessages').classList.remove('active');
                 renderAll();
             }
         });
@@ -1617,6 +1829,10 @@
             closePopup('messages');
             document.getElementById('navHome').click();
         });
+        document.getElementById('closePopupNotifications').addEventListener('click', function() {
+            closePopup('notifications');
+            document.getElementById('navHome').click();
+        });
         document.getElementById('popupAdmin').addEventListener('click', function(e) {
             if (e.target === this) { closePopup('admin'); document.getElementById('navHome').click(); }
         });
@@ -1625,6 +1841,9 @@
         });
         document.getElementById('popupMessages').addEventListener('click', function(e) {
             if (e.target === this) { closePopup('messages'); document.getElementById('navHome').click(); }
+        });
+        document.getElementById('popupNotifications').addEventListener('click', function(e) {
+            if (e.target === this) { closePopup('notifications'); document.getElementById('navHome').click(); }
         });
 
         // ===== MESSAGERIE EVENTS =====
@@ -1725,15 +1944,16 @@
         if (data.currentUser?.role === 'admin') openPopup('admin');
         else if (data.currentUser?.role === 'vendor') openPopup('vendor');
 
-        console.log('🛒 SHOPPRO · Version avec messagerie intégrée !');
+        console.log('🛒 SHOPPRO · Version avec messagerie et notifications !');
         console.log('📱 Upload d\'images depuis le téléphone');
         console.log('👑 Admin: admin@shop.com / admin123');
         console.log('👤 Vendeur: jean@parfums.com / vendor123');
         console.log('👤 Client: client@mail.com / client123');
-        console.log('💬 Système de messages entre acheteurs et vendeurs');
-        console.log('📦 Les vendeurs voient les coordonnées des acheteurs');
-        console.log('📋 Les acheteurs voient leur historique d\'achat');
+        console.log('💬 Système de messages entre acheteurs, vendeurs et admin');
+        console.log('📦 Les vendeurs et admin peuvent accepter/refuser les commandes');
+        console.log('🔔 Les clients reçoivent des notifications pour leurs commandes');
+        console.log('📋 Les acheteurs voient le statut de leurs commandes');
     })();
 </script>
 </body>
-    </html>
+</html>
