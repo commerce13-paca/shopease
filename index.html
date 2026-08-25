@@ -192,6 +192,27 @@
         .payment-method label{display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;font-weight:500;padding:0.2rem 0.6rem;border-radius:40px;border:1.5px solid var(--gray-200);cursor:pointer;transition:0.2s}
         .payment-method label:hover{border-color:var(--primary)}
         .payment-method input[type="radio"]{accent-color:var(--primary)}
+        /* ===== MESSAGERIE ===== */
+        .message-thread{max-height:300px;overflow-y:auto;margin-bottom:0.5rem;border:1px solid var(--gray-200);border-radius:var(--radius);padding:0.3rem;background:var(--white)}
+        .message-thread .msg{display:flex;flex-direction:column;margin-bottom:0.2rem;padding:0.2rem 0.5rem;border-radius:8px;font-size:0.7rem}
+        .msg.sent{background:var(--primary-light);align-items:flex-end;border-bottom-right-radius:0}
+        .msg.received{background:var(--gray-100);align-items:flex-start;border-bottom-left-radius:0}
+        .msg .msg-meta{font-size:0.5rem;color:var(--gray-400);display:flex;gap:0.3rem;margin-top:0.05rem}
+        .msg .msg-content{word-break:break-word}
+        .message-input{display:flex;gap:0.3rem;margin-top:0.3rem}
+        .message-input input{flex:1;padding:0.3rem 0.7rem;border-radius:40px;border:1.5px solid var(--gray-200);font-size:0.7rem;outline:none}
+        .message-input input:focus{border-color:var(--primary)}
+        .conversation-item{display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0.6rem;background:var(--white);border-radius:40px;border:1px solid var(--gray-200);margin-bottom:0.2rem;cursor:pointer;transition:0.2s}
+        .conversation-item:hover{background:var(--gray-50)}
+        .conversation-item .conv-info{display:flex;align-items:center;gap:0.4rem;font-size:0.7rem}
+        .conversation-item .conv-info .conv-avatar{width:24px;height:24px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700}
+        .conversation-item .conv-info .conv-name{font-weight:600}
+        .conversation-item .conv-last{font-size:0.6rem;color:var(--gray-400)}
+        .conversation-item .conv-unread{background:var(--red);color:white;font-size:0.5rem;font-weight:700;padding:0.05rem 0.3rem;border-radius:40px}
+        .msg-notif-badge{position:relative}
+        .msg-notif-badge .badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:white;font-size:0.45rem;font-weight:700;padding:0.02rem 0.3rem;border-radius:40px;border:2px solid white}
+        .msg-btn{background:var(--primary);color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:0.7rem}
+        .msg-btn:hover{background:var(--primary-dark)}
     </style>
 </head>
 <body>
@@ -203,6 +224,7 @@
             <a href="#" id="navHome" class="active"><i class="fas fa-home"></i> Accueil</a>
             <a href="#" id="navDashboard" class="hidden"><i class="fas fa-chart-pie"></i> Admin</a>
             <a href="#" id="navMyShop" class="hidden"><i class="fas fa-store"></i> Ma boutique</a>
+            <a href="#" id="navMessages" class="hidden"><i class="fas fa-envelope"></i> Messages <span id="msgNavBadge" class="hidden" style="background:var(--red);color:white;font-size:0.5rem;padding:0.02rem 0.3rem;border-radius:40px;">0</span></a>
         </nav>
         <div class="user-section" id="userSection">
             <div class="avatar" id="userAvatar">👤<span class="online-dot" id="onlineDot"></span></div>
@@ -239,12 +261,10 @@
                 <div class="stat-card"><div class="number" id="statOrders">0</div><div class="label">Commandes</div></div>
                 <div class="stat-card"><div class="number" id="statRevenue">0 €</div><div class="label">CA total</div></div>
             </div>
-            <!-- Activité récente (admin seulement) -->
             <div class="panel" id="adminActivityPanel">
                 <div class="panel-title"><i class="fas fa-bolt"></i> Activité récente</div>
                 <div id="adminActivityList"></div>
             </div>
-            <!-- Publier un produit -->
             <div class="panel" style="border-color:var(--primary);border-width:2px;">
                 <div class="panel-title"><i class="fas fa-plus-circle" style="color:var(--primary);"></i> Publier un produit</div>
                 <form id="adminProductForm" class="form-row">
@@ -256,7 +276,6 @@
                     <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Publier</button>
                 </form>
             </div>
-            <!-- Inviter vendeur -->
             <div class="panel">
                 <div class="panel-title"><i class="fas fa-user-plus"></i> Inviter un vendeur</div>
                 <form id="inviteForm" class="form-row">
@@ -266,17 +285,14 @@
                     <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Inviter</button>
                 </form>
             </div>
-            <!-- Liste vendeurs -->
             <div class="panel">
                 <div class="panel-title"><i class="fas fa-users"></i> Vendeurs</div>
                 <div id="vendorList"></div>
             </div>
-            <!-- Tous les produits -->
             <div class="panel">
                 <div class="panel-title"><i class="fas fa-boxes"></i> Tous les produits</div>
                 <div id="adminProductList"></div>
             </div>
-            <!-- Commandes -->
             <div class="panel">
                 <div class="panel-title"><i class="fas fa-history"></i> Commandes</div>
                 <div id="historyList"></div>
@@ -309,10 +325,31 @@
                 <div class="panel-title"><i class="fas fa-list-ul"></i> Mes produits</div>
                 <div id="vendorProductList"></div>
             </div>
-            <!-- Commandes reçues avec détails acheteur -->
             <div class="panel">
                 <div class="panel-title"><i class="fas fa-truck"></i> Commandes reçues</div>
                 <div id="vendorOrdersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP MESSAGERIE -->
+    <div id="popupMessages" class="popup-overlay">
+        <div class="popup-content">
+            <button class="popup-close" id="closePopupMessages"><i class="fas fa-times"></i></button>
+            <div class="popup-title"><i class="fas fa-envelope"></i> Messages</div>
+            <div id="conversationList" class="panel" style="padding:0.4rem;">
+                <div style="font-size:0.6rem;color:var(--gray-400);text-align:center;padding:1rem;">Sélectionnez une conversation</div>
+            </div>
+            <div id="messageThreadContainer" class="panel hidden" style="padding:0.4rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">
+                    <span id="currentConversationName" style="font-weight:600;font-size:0.8rem;"></span>
+                    <button class="btn btn-sm btn-outline" id="backToConversations">← Retour</button>
+                </div>
+                <div id="messageThread" class="message-thread"></div>
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Écrire un message...">
+                    <button class="btn btn-primary btn-sm" id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -340,7 +377,6 @@
         <div class="modal-box">
             <div class="profile-header"><div class="big-avatar" id="profileAvatar">👤</div><div class="profile-info"><h3 id="profileName">Utilisateur</h3><p id="profileEmail">email@exemple.com</p><span class="badge-role" id="profileRole">visiteur</span></div></div>
             <div class="profile-stats"><div class="pstat"><div class="num" id="profileProducts">0</div><div class="label">Produits</div></div><div class="pstat"><div class="num" id="profileOrders">0</div><div class="label">Commandes</div></div><div class="pstat"><div class="num" id="profileRevenue">0 €</div><div class="label">CA</div></div></div>
-            <!-- Historique des achats -->
             <div style="margin-top:0.8rem;border-top:1px solid var(--gray-200);padding-top:0.6rem;">
                 <div style="font-weight:700;font-size:0.8rem;margin-bottom:0.4rem;"><i class="fas fa-history"></i> Historique d'achat</div>
                 <div id="profileOrderHistory"></div>
@@ -416,7 +452,7 @@
 
         // ===== DATA =====
         function loadData() {
-            const raw = localStorage.getItem('shoppro_data_v11');
+            const raw = localStorage.getItem('shoppro_data_v12');
             if (raw) { try { return JSON.parse(raw) } catch(e) {} }
             return {
                 users: [
@@ -445,15 +481,22 @@
                     { user: 'Sarah K.', action: 'a vendu "Hoodie Oversize" à Marc', time: 'Il y a 5h', avatar: 'SK' },
                     { user: 'Admin', action: 'a invité un nouveau vendeur', time: 'Il y a 1 jour', avatar: 'A' }
                 ],
+                messages: [
+                    { id: 1, from: 'client@mail.com', to: 'jean@parfums.com', content: 'Bonjour, ce parfum est-il disponible en 100ml ?', date: '2026-08-23 09:00', read: true },
+                    { id: 2, from: 'jean@parfums.com', to: 'client@mail.com', content: 'Bonjour, oui tout à fait ! Je peux vous le faire à 95€ le 100ml.', date: '2026-08-23 09:15', read: true },
+                    { id: 3, from: 'client@mail.com', to: 'jean@parfums.com', content: 'Super, je prends !', date: '2026-08-23 09:30', read: false },
+                    { id: 4, from: 'client@mail.com', to: 'sarah@street.com', content: 'Bonjour, le hoodie existe-t-il en taille XL ?', date: '2026-08-23 11:00', read: false }
+                ],
                 currentUser: null,
                 currentFilter: 'all',
                 nextId: 6,
-                nextOrderId: 103
+                nextOrderId: 103,
+                nextMsgId: 5
             }
         }
         let data = loadData();
 
-        function saveData() { localStorage.setItem('shoppro_data_v11', JSON.stringify(data)) }
+        function saveData() { localStorage.setItem('shoppro_data_v12', JSON.stringify(data)) }
 
         // ===== UTILS =====
         function fileToBase64(file) {
@@ -515,14 +558,157 @@
             return `· ${filter}`;
         }
 
+        // ===== MESSAGERIE =====
+        function getConversations(userEmail) {
+            const convs = {};
+            data.messages.forEach(msg => {
+                let other = msg.from === userEmail ? msg.to : msg.from;
+                if (!convs[other]) convs[other] = [];
+                convs[other].push(msg);
+            });
+            return convs;
+        }
+
+        function getUnreadCount(userEmail) {
+            return data.messages.filter(m => m.to === userEmail && !m.read).length;
+        }
+
+        function markAsRead(userEmail, otherEmail) {
+            data.messages.forEach(m => {
+                if (m.to === userEmail && m.from === otherEmail && !m.read) m.read = true;
+            });
+            saveData();
+        }
+
+        function sendMessage(from, to, content) {
+            if (!content.trim()) return;
+            data.messages.push({
+                id: data.nextMsgId++,
+                from: from,
+                to: to,
+                content: content.trim(),
+                date: new Date().toLocaleString('fr-FR', { hour12: false }),
+                read: false
+            });
+            saveData();
+            renderAll();
+            // Si la fenêtre de messagerie est ouverte, on met à jour l'affichage
+            if (document.getElementById('popupMessages').classList.contains('active')) {
+                renderConversations();
+                if (document.getElementById('messageThreadContainer').classList.contains('hidden') === false) {
+                    const currentConv = document.getElementById('currentConversationName').dataset.email;
+                    if (currentConv) renderThread(currentConv);
+                }
+            }
+        }
+
+        function renderConversations() {
+            const user = data.currentUser;
+            if (!user) return;
+            const convs = getConversations(user.email);
+            const container = document.getElementById('conversationList');
+            container.innerHTML = '';
+            const keys = Object.keys(convs);
+            if (keys.length === 0) {
+                container.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;font-size:0.75rem;">Aucune conversation</div>`;
+                return;
+            }
+            keys.forEach(other => {
+                const otherUser = getUserByEmail(other);
+                const name = otherUser ? otherUser.name : other;
+                const msgs = convs[other];
+                const lastMsg = msgs[msgs.length - 1];
+                const unread = msgs.filter(m => m.to === user.email && !m.read).length;
+                const div = document.createElement('div');
+                div.className = 'conversation-item';
+                div.innerHTML = `
+                    <div class="conv-info">
+                        <div class="conv-avatar">${name.charAt(0).toUpperCase()}</div>
+                        <span class="conv-name">${name}</span>
+                        <span class="conv-last">${lastMsg ? lastMsg.content.substring(0,20) + (lastMsg.content.length > 20 ? '...' : '') : ''}</span>
+                    </div>
+                    ${unread > 0 ? `<span class="conv-unread">${unread}</span>` : ''}
+                `;
+                div.addEventListener('click', () => {
+                    markAsRead(user.email, other);
+                    renderAll();
+                    openThread(other, name);
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function openThread(otherEmail, otherName) {
+            const container = document.getElementById('conversationList');
+            const threadContainer = document.getElementById('messageThreadContainer');
+            container.classList.add('hidden');
+            threadContainer.classList.remove('hidden');
+            document.getElementById('currentConversationName').textContent = otherName;
+            document.getElementById('currentConversationName').dataset.email = otherEmail;
+            renderThread(otherEmail);
+        }
+
+        function renderThread(otherEmail) {
+            const user = data.currentUser;
+            if (!user) return;
+            const thread = document.getElementById('messageThread');
+            thread.innerHTML = '';
+            const msgs = data.messages.filter(m => (m.from === user.email && m.to === otherEmail) || (m.from === otherEmail && m.to === user.email));
+            msgs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (msgs.length === 0) {
+                thread.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;">Aucun message</div>`;
+                return;
+            }
+            msgs.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `msg ${msg.from === user.email ? 'sent' : 'received'}`;
+                div.innerHTML = `
+                    <div class="msg-content">${msg.content}</div>
+                    <div class="msg-meta">${msg.date}</div>
+                `;
+                thread.appendChild(div);
+            });
+            thread.scrollTop = thread.scrollHeight;
+        }
+
+        function backToConversations() {
+            document.getElementById('conversationList').classList.remove('hidden');
+            document.getElementById('messageThreadContainer').classList.add('hidden');
+            renderConversations();
+        }
+
+        function updateMsgNavBadge() {
+            const badge = document.getElementById('msgNavBadge');
+            const user = data.currentUser;
+            if (user) {
+                const unread = getUnreadCount(user.email);
+                if (unread > 0) {
+                    badge.classList.remove('hidden');
+                    badge.textContent = unread;
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
         // ===== POPUPS / MODALS =====
         function openPopup(type) {
             if (type === 'admin') { document.getElementById('popupAdmin').classList.add('active'); document.body.style.overflow = 'hidden' }
             else if (type === 'vendor') { document.getElementById('popupMyShop').classList.add('active'); document.body.style.overflow = 'hidden' }
+            else if (type === 'messages') {
+                document.getElementById('popupMessages').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                renderConversations();
+                backToConversations();
+                updateMsgNavBadge();
+            }
         }
         function closePopup(type) {
             if (type === 'admin') { document.getElementById('popupAdmin').classList.remove('active'); document.body.style.overflow = '' }
             else if (type === 'vendor') { document.getElementById('popupMyShop').classList.remove('active'); document.body.style.overflow = '' }
+            else if (type === 'messages') { document.getElementById('popupMessages').classList.remove('active'); document.body.style.overflow = '' }
         }
 
         function openImageZoom(src) {
@@ -603,6 +789,7 @@
                     <div class="actions">
                         ${isInStock ? `<button class="btn btn-primary btn-sm buy-btn" data-id="${p.id}"><i class="fas fa-shopping-cart"></i></button>` : `<button class="btn btn-outline btn-sm" disabled><i class="fas fa-times"></i></button>`}
                         <button class="btn btn-warning btn-sm review-btn" data-id="${p.id}"><i class="fas fa-star"></i></button>
+                        ${vendor ? `<button class="btn btn-primary btn-sm msg-btn" data-vendor="${vendor.email}" data-product="${p.name}"><i class="fas fa-envelope"></i></button>` : ''}
                         ${canDelete ? `<button class="btn btn-danger btn-sm del-product" data-id="${p.id}"><i class="fas fa-trash"></i></button>` : ''}
                         ${canDelete ? `<button class="btn btn-primary btn-sm edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>` : ''}
                     </div>
@@ -627,6 +814,31 @@
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     openReviewModal(parseInt(this.dataset.id));
+                });
+            });
+            document.querySelectorAll('.msg-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (!data.currentUser) {
+                        showToast('Connectez-vous pour envoyer un message.', 'error');
+                        openAuthModal();
+                        return;
+                    }
+                    const vendorEmail = this.dataset.vendor;
+                    const productName = this.dataset.product;
+                    if (vendorEmail === data.currentUser.email) {
+                        showToast('Vous ne pouvez pas vous envoyer un message à vous-même.', 'warning');
+                        return;
+                    }
+                    openPopup('messages');
+                    const otherUser = getUserByEmail(vendorEmail);
+                    const name = otherUser ? otherUser.name : vendorEmail;
+                    // On ouvre la conversation avec ce vendeur
+                    setTimeout(() => {
+                        markAsRead(data.currentUser.email, vendorEmail);
+                        renderAll();
+                        openThread(vendorEmail, name);
+                    }, 100);
                 });
             });
             document.querySelectorAll('.del-product').forEach(btn => {
@@ -789,7 +1001,6 @@
                 });
             }
 
-            // Commandes reçues avec détails acheteur
             const ordersList = document.getElementById('vendorOrdersList');
             ordersList.innerHTML = '';
             const vendorOrders = data.orders.filter(o => o.vendorId === user.id);
@@ -857,6 +1068,7 @@
             renderVendorShop();
             renderProfileOrders();
             updateNav();
+            updateMsgNavBadge();
             saveData();
         }
 
@@ -869,12 +1081,14 @@
             const authBtnEl = document.getElementById('authBtn');
             const navDashboard = document.getElementById('navDashboard');
             const navMyShop = document.getElementById('navMyShop');
+            const navMessages = document.getElementById('navMessages');
 
             if (user) {
                 const displayName = user.name || user.email.split('@')[0];
                 userNameEl.textContent = displayName;
                 userAvatarEl.innerHTML = `${displayName.charAt(0).toUpperCase()}<span class="online-dot" id="onlineDot"></span>`;
                 authBtnEl.textContent = '';
+                navMessages.classList.remove('hidden');
                 if (user.role === 'admin') {
                     roleBadgeEl.textContent = 'admin';
                     roleBadgeEl.className = 'badge-role admin';
@@ -899,8 +1113,10 @@
                 roleBadgeEl.className = 'badge-role';
                 navDashboard.classList.add('hidden');
                 navMyShop.classList.add('hidden');
+                navMessages.classList.add('hidden');
                 closePopup('admin');
                 closePopup('vendor');
+                closePopup('messages');
             }
         }
 
@@ -1278,6 +1494,7 @@
             data.currentFilter = 'all';
             closePopup('admin');
             closePopup('vendor');
+            closePopup('messages');
             renderAll();
             showToast('👋 Déconnexion');
         }
@@ -1335,9 +1552,11 @@
             data.currentFilter = 'all';
             closePopup('admin');
             closePopup('vendor');
+            closePopup('messages');
             document.getElementById('navHome').classList.add('active');
             document.getElementById('navDashboard').classList.remove('active');
             document.getElementById('navMyShop').classList.remove('active');
+            document.getElementById('navMessages').classList.remove('active');
             renderAll();
         });
 
@@ -1346,10 +1565,12 @@
             if (data.currentUser?.role === 'admin') {
                 closePopup('admin');
                 closePopup('vendor');
+                closePopup('messages');
                 openPopup('admin');
                 document.getElementById('navDashboard').classList.add('active');
                 document.getElementById('navHome').classList.remove('active');
                 document.getElementById('navMyShop').classList.remove('active');
+                document.getElementById('navMessages').classList.remove('active');
                 renderAll();
             }
         });
@@ -1359,10 +1580,26 @@
             if (data.currentUser?.role === 'vendor') {
                 closePopup('admin');
                 closePopup('vendor');
+                closePopup('messages');
                 openPopup('vendor');
                 document.getElementById('navMyShop').classList.add('active');
                 document.getElementById('navHome').classList.remove('active');
                 document.getElementById('navDashboard').classList.remove('active');
+                document.getElementById('navMessages').classList.remove('active');
+                renderAll();
+            }
+        });
+
+        document.getElementById('navMessages').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (data.currentUser) {
+                closePopup('admin');
+                closePopup('vendor');
+                openPopup('messages');
+                document.getElementById('navMessages').classList.add('active');
+                document.getElementById('navHome').classList.remove('active');
+                document.getElementById('navDashboard').classList.remove('active');
+                document.getElementById('navMyShop').classList.remove('active');
                 renderAll();
             }
         });
@@ -1376,11 +1613,41 @@
             closePopup('vendor');
             document.getElementById('navHome').click();
         });
+        document.getElementById('closePopupMessages').addEventListener('click', function() {
+            closePopup('messages');
+            document.getElementById('navHome').click();
+        });
         document.getElementById('popupAdmin').addEventListener('click', function(e) {
             if (e.target === this) { closePopup('admin'); document.getElementById('navHome').click(); }
         });
         document.getElementById('popupMyShop').addEventListener('click', function(e) {
             if (e.target === this) { closePopup('vendor'); document.getElementById('navHome').click(); }
+        });
+        document.getElementById('popupMessages').addEventListener('click', function(e) {
+            if (e.target === this) { closePopup('messages'); document.getElementById('navHome').click(); }
+        });
+
+        // ===== MESSAGERIE EVENTS =====
+        document.getElementById('backToConversations').addEventListener('click', function() {
+            backToConversations();
+        });
+
+        document.getElementById('sendMessageBtn').addEventListener('click', function() {
+            const user = data.currentUser;
+            if (!user) return showToast('Connectez-vous pour envoyer un message.', 'error');
+            const otherEmail = document.getElementById('currentConversationName').dataset.email;
+            if (!otherEmail) return;
+            const content = document.getElementById('messageInput').value;
+            if (!content.trim()) return;
+            sendMessage(user.email, otherEmail, content);
+            document.getElementById('messageInput').value = '';
+        });
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('sendMessageBtn').click();
+            }
         });
 
         // ===== ADMIN PRODUCT FORM =====
@@ -1458,11 +1725,12 @@
         if (data.currentUser?.role === 'admin') openPopup('admin');
         else if (data.currentUser?.role === 'vendor') openPopup('vendor');
 
-        console.log('🛒 SHOPPRO · Version finale avec détails acheteurs !');
+        console.log('🛒 SHOPPRO · Version avec messagerie intégrée !');
         console.log('📱 Upload d\'images depuis le téléphone');
         console.log('👑 Admin: admin@shop.com / admin123');
         console.log('👤 Vendeur: jean@parfums.com / vendor123');
         console.log('👤 Client: client@mail.com / client123');
+        console.log('💬 Système de messages entre acheteurs et vendeurs');
         console.log('📦 Les vendeurs voient les coordonnées des acheteurs');
         console.log('📋 Les acheteurs voient leur historique d\'achat');
     })();
