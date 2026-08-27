@@ -6,7 +6,9 @@
     <title>SHOP·Stoïque· Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
     <style>
+        /* ===== STYLES COMPLETS (conservés) ===== */
         *{margin:0;padding:0;box-sizing:border-box}
         :root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;--bg:#f1f5f9;--white:#ffffff;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--radius:16px;--shadow:0 1px 3px rgba(0,0,0,0.06);--shadow-lg:0 10px 40px rgba(0,0,0,0.08)}
         body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--gray-800);min-height:100vh;-webkit-tap-highlight-color:transparent}
@@ -206,6 +208,14 @@
         .notif-item .notif-icon{color:var(--primary);font-size:0.8rem}
         .notif-item .notif-time{font-size:0.55rem;color:var(--gray-400);margin-left:auto}
         .notif-item.unread{background:var(--primary-light);border-color:var(--primary)}
+        .activity-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-100)}
+        .activity-item:last-child{border-bottom:none}
+        .activity-item .activity-avatar{width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.6rem;flex-shrink:0}
+        .activity-item .activity-content{flex:1;font-size:0.7rem}
+        .activity-item .activity-content .text strong{color:var(--gray-700)}
+        .activity-item .activity-content .time{font-size:0.55rem;color:var(--gray-400)}
+        .msg-notif-btn{background:var(--primary);color:white;border:none;padding:2px 10px;border-radius:20px;font-size:0.6rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+        .msg-notif-btn:hover{background:var(--primary-dark)}
     </style>
 </head>
 <body>
@@ -449,77 +459,31 @@
     (function() {
         "use strict";
 
-        // ===== COOKIES =====
-        function checkCookies() { if(localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').classList.add('hidden') }
-        document.getElementById('acceptCookies').addEventListener('click', function() { localStorage.setItem('cookies_accepted', 'true'); document.getElementById('cookieBanner').classList.add('hidden'); showToast('🍪 Cookies acceptés !') });
+        // ============================================
+        // SUPABASE
+        // ============================================
+        const SUPABASE_URL = 'https://tqroznvhhinmleunxxue.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxcm96bnZoaGlubWxldW54eHVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NjM1MTksImV4cCI6MjEwMzIzOTUxOX0.teUhbp1npKdts0Z2W3ruH_PeglHNetU8LwxZDOhZ2ws';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ===== DATA =====
-        function loadData() {
-            const raw = localStorage.getItem('shoppro_data_v13');
-            if (raw) { try { return JSON.parse(raw) } catch(e) {} }
-            return {
-                users: [
-                    { id: 1, email: 'admin@shop.com', password: 'admin123', role: 'admin', name: 'Admin', address: '', phone: '' },
-                    { id: 2, email: 'jean@parfums.com', password: 'vendor123', role: 'vendor', name: 'Jean Martin', category: 'Parfums & Luxe', address: '5 rue des Parfums, 75001 Paris', phone: '06 11 22 33 44' },
-                    { id: 3, email: 'sarah@street.com', password: 'vendor123', role: 'vendor', name: 'Sarah K.', category: 'Streetwear', address: '12 rue de la Mode, 75002 Paris', phone: '06 55 66 77 88' },
-                    { id: 4, email: 'client@mail.com', password: 'client123', role: 'user', name: 'Client Test', address: '15 avenue des Champs, 75008 Paris', phone: '06 98 76 54 32' }
-                ],
-                vendors: [
-                    { id: 2, name: 'Jean Martin', email: 'jean@parfums.com', category: 'Parfums & Luxe', rating: 4.8, reviews: 156 },
-                    { id: 3, name: 'Sarah K.', email: 'sarah@street.com', category: 'Streetwear', rating: 4.5, reviews: 89 }
-                ],
-                products: [
-                    { id: 1, vendorId: 2, name: 'Oud Noir', price: 89.90, desc: 'Parfum oriental luxueux aux notes de bois précieux', image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&h=400&fit=crop', rating: 4.9, reviews: 42, stock: 15 },
-                    { id: 2, vendorId: 2, name: 'Ambre Royal', price: 69.90, desc: 'Fragrance chaude et boisée à l\'ambre gris', image: 'https://images.unsplash.com/photo-1585386959984-415bd4fad4c8?w=400&h=400&fit=crop', rating: 4.7, reviews: 38, stock: 8 },
-                    { id: 3, vendorId: 3, name: 'Hoodie Oversize', price: 59.90, desc: 'Sweat streetwear coupe large en coton bio', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop', rating: 4.6, reviews: 27, stock: 3 },
-                    { id: 4, vendorId: 3, name: 'Casquette Snapback', price: 29.90, desc: 'Casquette tendance brodée main', image: 'https://images.unsplash.com/photo-1535982330050-f1c2fb79ff78?w=400&h=400&fit=crop', rating: 4.3, reviews: 19, stock: 0 },
-                    { id: 5, vendorId: 1, name: 'Sweat Édition Limitée', price: 79.90, desc: 'Collection exclusive SHOPPRO en édition limitée', image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=400&fit=crop', rating: 4.9, reviews: 63, stock: 5 }
-                ],
-                orders: [
-                    { id: 101, productId: 1, productName: 'Oud Noir', price: 89.90, date: '2026-08-22 15:30', buyer: 'client@mail.com', buyerName: 'Client Test', buyerAddress: '15 avenue des Champs, 75008 Paris', buyerPhone: '06 98 76 54 32', vendorId: 2, status: 'completed', paymentMethod: 'card' },
-                    { id: 102, productId: 3, productName: 'Hoodie Oversize', price: 59.90, date: '2026-08-23 10:15', buyer: 'client@mail.com', buyerName: 'Client Test', buyerAddress: '15 avenue des Champs, 75008 Paris', buyerPhone: '06 98 76 54 32', vendorId: 3, status: 'pending', paymentMethod: 'cash' }
-                ],
-                activities: [
-                    { user: 'Jean Martin', action: 'a ajouté le produit "Oud Noir"', time: 'Il y a 2h', avatar: 'JM' },
-                    { user: 'Sarah K.', action: 'a vendu "Hoodie Oversize" à Marc', time: 'Il y a 5h', avatar: 'SK' },
-                    { user: 'Admin', action: 'a invité un nouveau vendeur', time: 'Il y a 1 jour', avatar: 'A' }
-                ],
-                messages: [
-                    { id: 1, from: 'client@mail.com', to: 'jean@parfums.com', content: 'Bonjour, ce parfum est-il disponible en 100ml ?', date: '2026-08-23 09:00', read: true },
-                    { id: 2, from: 'jean@parfums.com', to: 'client@mail.com', content: 'Bonjour, oui tout à fait ! Je peux vous le faire à 95€ le 100ml.', date: '2026-08-23 09:15', read: true },
-                    { id: 3, from: 'client@mail.com', to: 'jean@parfums.com', content: 'Super, je prends !', date: '2026-08-23 09:30', read: false },
-                    { id: 4, from: 'client@mail.com', to: 'sarah@street.com', content: 'Bonjour, le hoodie existe-t-il en taille XL ?', date: '2026-08-23 11:00', read: false }
-                ],
-                notifications: [
-                    { id: 1, userId: 'client@mail.com', type: 'order', message: 'Votre commande "Oud Noir" a été acceptée par le vendeur.', date: '2026-08-22 16:00', read: false },
-                    { id: 2, userId: 'client@mail.com', type: 'order', message: 'Votre commande "Hoodie Oversize" est en attente de validation.', date: '2026-08-23 10:30', read: false }
-                ],
-                currentUser: null,
-                currentFilter: 'all',
-                nextId: 6,
-                nextOrderId: 103,
-                nextMsgId: 5,
-                nextNotifId: 3
-            }
-        }
-        let data = loadData();
+        // ============================================
+        // ÉTAT
+        // ============================================
+        let state = {
+            currentUser: null,
+            currentProfile: null,
+            currentFilter: 'all',
+            products: [],
+            orders: [],
+            activities: [],
+            vendors: [],
+            messages: [],
+            notifications: []
+        };
 
-        function saveData() { localStorage.setItem('shoppro_data_v13', JSON.stringify(data)) }
-
-        // ===== UTILS =====
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function getDefaultImage() {
-            return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop';
-        }
-
+        // ============================================
+        // UTILS
+        // ============================================
         function showToast(message, type = 'success') {
             const existing = document.querySelector('.toast');
             if (existing) existing.remove();
@@ -531,382 +495,401 @@
         }
 
         function renderStars(rating) {
-            const full = Math.floor(rating);
-            const half = rating % 1 >= 0.5 ? 1 : 0;
+            const full = Math.floor(rating || 0);
+            const half = (rating || 0) % 1 >= 0.5 ? 1 : 0;
             const empty = 5 - full - half;
             return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
         }
 
-        function getVendor(id) { return data.vendors.find(v => v.id === id) }
-        function getUser(id) { return data.users.find(u => u.id === id) }
-        function getUserByEmail(email) { return data.users.find(u => u.email === email) }
-        function getVendorProducts(vendorId) { return data.products.filter(p => p.vendorId === vendorId) }
+        function getDefaultImage() {
+            return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop';
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function getVendor(id) { return state.vendors.find(v => v.id === id); }
+        function getVendorProducts(vendorId) { return state.products.filter(p => p.vendor_id === vendorId); }
         function getProductsByFilter(filter) {
-            if (filter === 'all') return data.products;
-            const vendor = data.vendors.find(v => v.category === filter);
+            if (filter === 'all') return state.products;
+            const vendor = state.vendors.find(v => v.category === filter);
             if (!vendor) return [];
-            return data.products.filter(p => p.vendorId === vendor.id);
+            return state.products.filter(p => p.vendor_id === vendor.id);
         }
         function getVendorStats(vendorId) {
             const prods = getVendorProducts(vendorId);
-            const orders = data.orders.filter(o => o.vendorId === vendorId);
-            const revenue = orders.reduce((sum, o) => sum + o.price, 0);
+            const orders = state.orders.filter(o => o.vendor_id === vendorId);
+            const revenue = orders.reduce((sum, o) => sum + (o.price || 0), 0);
             return { products: prods.length, orders: orders.length, revenue };
         }
-        function getUserStats(userId) {
-            const user = getUser(userId);
-            if (!user) return { products: 0, orders: 0, revenue: 0 };
-            if (user.role === 'vendor') { return getVendorStats(userId) }
-            const orders = data.orders.filter(o => o.buyer === user.email);
-            const revenue = orders.reduce((sum, o) => sum + o.price, 0);
-            return { products: 0, orders: orders.length, revenue };
-        }
-        function getFilterLabel(filter) {
-            if (filter === 'all') return '';
-            return `· ${filter}`;
-        }
         function getOrderStatusLabel(status) {
-            const labels = {
-                'pending': '⏳ En attente',
-                'completed': '✅ Validée',
-                'cancelled': '❌ Annulée'
-            };
+            const labels = { 'pending': '⏳ En attente', 'completed': '✅ Validée', 'cancelled': '❌ Annulée' };
             return labels[status] || status;
         }
+        function getUserByEmail(email) {
+            // Chercher dans vendors ou profiles
+            return state.vendors.find(v => v.email === email) || null;
+        }
 
-        // ===== NOTIFICATIONS =====
-        function addNotification(userId, type, message) {
-            data.notifications.push({
-                id: data.nextNotifId++,
-                userId: userId,
-                type: type,
-                message: message,
-                date: new Date().toLocaleString('fr-FR', { hour12: false }),
-                read: false
+        // ============================================
+        // SUPABASE OPERATIONS
+        // ============================================
+
+        // --- AUTH ---
+        async function signIn(email, password) {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            return data;
+        }
+
+        async function signUp(email, password, metadata) {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: metadata }
             });
-            saveData();
+            if (error) throw error;
+            return data;
         }
 
-        function getUnreadNotifications(userEmail) {
-            return data.notifications.filter(n => n.userId === userEmail && !n.read);
+        async function signOut() {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
         }
 
-        function markNotificationAsRead(id) {
-            const notif = data.notifications.find(n => n.id === id);
-            if (notif) notif.read = true;
-            saveData();
+        async function getSession() {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw error;
+            return data.session;
         }
 
-        function markAllNotificationsAsRead(userEmail) {
-            data.notifications.forEach(n => { if (n.userId === userEmail) n.read = true });
-            saveData();
+        // --- PROFILES ---
+        async function getProfile(userId) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+            if (error && error.code !== 'PGRST116') throw error;
+            return data;
         }
 
-        function renderNotifications() {
-            const user = data.currentUser;
-            if (!user) return;
-            const list = document.getElementById('notificationsList');
-            list.innerHTML = '';
-            const notifs = data.notifications.filter(n => n.userId === user.email).sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (notifs.length === 0) {
-                list.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;font-size:0.75rem;">Aucune notification</div>`;
-                return;
+        async function createProfile(userId, email, name, role = 'user', category = null) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .insert([{ id: userId, email, name, role, category }])
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function updateProfile(userId, updates) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', userId)
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        // --- VENDORS ---
+        async function getVendors() {
+            const { data, error } = await supabase
+                .from('vendors')
+                .select('*');
+            if (error) throw error;
+            return data || [];
+        }
+
+        async function createVendor(userId, name, email, category) {
+            const { data, error } = await supabase
+                .from('vendors')
+                .insert([{ user_id: userId, name, email, category }])
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        // --- PRODUCTS ---
+        async function getProducts() {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            return data || [];
+        }
+
+        async function createProduct(product) {
+            const { data, error } = await supabase
+                .from('products')
+                .insert([product])
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function updateProduct(id, updates) {
+            const { data, error } = await supabase
+                .from('products')
+                .update(updates)
+                .eq('id', id)
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function deleteProduct(id) {
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('id', id);
+            if (error) throw error;
+        }
+
+        // --- ORDERS ---
+        async function getOrders() {
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('date', { ascending: false });
+            if (error) throw error;
+            return data || [];
+        }
+
+        async function createOrder(order) {
+            const { data, error } = await supabase
+                .from('orders')
+                .insert([order])
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function updateOrderStatus(orderId, status) {
+            const { data, error } = await supabase
+                .from('orders')
+                .update({ status })
+                .eq('id', orderId)
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        // --- MESSAGES ---
+        async function getMessages(userEmail) {
+            const { data, error } = await supabase
+                .from('messages')
+                .select('*')
+                .or(`sender_email.eq.${userEmail},receiver_email.eq.${userEmail}`)
+                .order('date', { ascending: true });
+            if (error) throw error;
+            return data || [];
+        }
+
+        async function sendMessage(senderEmail, receiverEmail, content) {
+            const { data, error } = await supabase
+                .from('messages')
+                .insert({ sender_email: senderEmail, receiver_email: receiverEmail, content })
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function markMessagesAsRead(receiverEmail, senderEmail) {
+            const { error } = await supabase
+                .from('messages')
+                .update({ read: true })
+                .eq('receiver_email', receiverEmail)
+                .eq('sender_email', senderEmail)
+                .eq('read', false);
+            if (error) throw error;
+        }
+
+        // --- NOTIFICATIONS ---
+        async function getNotifications(userEmail) {
+            const { data, error } = await supabase
+                .from('notifications')
+                .select('*')
+                .eq('user_email', userEmail)
+                .order('date', { ascending: false });
+            if (error) throw error;
+            return data || [];
+        }
+
+        async function addNotification(userEmail, type, message) {
+            const { data, error } = await supabase
+                .from('notifications')
+                .insert({ user_email: userEmail, type, message })
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function markNotificationAsRead(notifId) {
+            const { error } = await supabase
+                .from('notifications')
+                .update({ read: true })
+                .eq('id', notifId);
+            if (error) throw error;
+        }
+
+        async function markAllNotificationsAsRead(userEmail) {
+            const { error } = await supabase
+                .from('notifications')
+                .update({ read: true })
+                .eq('user_email', userEmail)
+                .eq('read', false);
+            if (error) throw error;
+        }
+
+        // --- ACTIVITIES ---
+        async function getActivities() {
+            const { data, error } = await supabase
+                .from('activities')
+                .select('*')
+                .order('time', { ascending: false })
+                .limit(10);
+            if (error) throw error;
+            return data || [];
+        }
+
+        async function addActivity(userName, action, avatar = null) {
+            const { data, error } = await supabase
+                .from('activities')
+                .insert({ user_name: userName, action, avatar })
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        }
+
+        // ============================================
+        // LOAD DATA
+        // ============================================
+        async function loadAllData() {
+            try {
+                const [products, orders, vendors, activities] = await Promise.all([
+                    getProducts(),
+                    getOrders(),
+                    getVendors(),
+                    getActivities()
+                ]);
+                state.products = products;
+                state.orders = orders;
+                state.vendors = vendors;
+                state.activities = activities;
+            } catch (error) {
+                console.error('Erreur chargement données:', error);
             }
-            notifs.forEach(n => {
-                const div = document.createElement('div');
-                div.className = `notif-item ${!n.read ? 'unread' : ''}`;
-                div.innerHTML = `
-                    <span class="notif-icon"><i class="fas ${n.type === 'order' ? 'fa-shopping-cart' : 'fa-info-circle'}"></i></span>
-                    <span>${n.message}</span>
-                    <span class="notif-time">${n.date}</span>
-                    ${!n.read ? `<button class="btn btn-sm btn-primary" data-id="${n.id}">Marquer lu</button>` : ''}
-                `;
-                list.appendChild(div);
-            });
-            document.querySelectorAll('#notificationsList .btn-primary').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    markNotificationAsRead(parseInt(this.dataset.id));
-                    renderAll();
-                    renderNotifications();
-                });
-            });
         }
 
-        function updateNotifBadge() {
-            const badge = document.getElementById('notifNavBadge');
-            const user = data.currentUser;
-            if (user) {
-                const unread = getUnreadNotifications(user.email).length;
-                if (unread > 0) {
-                    badge.classList.remove('hidden');
-                    badge.textContent = unread;
+        async function loadUserData(userEmail) {
+            try {
+                const [messages, notifications] = await Promise.all([
+                    getMessages(userEmail),
+                    getNotifications(userEmail)
+                ]);
+                state.messages = messages;
+                state.notifications = notifications;
+            } catch (error) {
+                console.error('Erreur chargement données utilisateur:', error);
+            }
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        async function init() {
+            try {
+                const session = await getSession();
+                if (session) {
+                    const user = session.user;
+                    const profile = await getProfile(user.id);
+                    if (profile) {
+                        state.currentUser = user;
+                        state.currentProfile = profile;
+                        await loadUserData(profile.email);
+                        await loadAllData();
+                        updateUI();
+                        showToast(`👋 Bonjour ${profile.name}!`);
+                    } else {
+                        await signOut();
+                        state.currentUser = null;
+                        state.currentProfile = null;
+                        await loadAllData();
+                        updateUI();
+                    }
                 } else {
-                    badge.classList.add('hidden');
+                    await loadAllData();
+                    updateUI();
                 }
-            } else {
-                badge.classList.add('hidden');
+            } catch (error) {
+                console.error('Erreur d\'initialisation:', error);
+                showToast('Erreur de connexion à la base de données', 'error');
             }
         }
 
-        // ===== MESSAGERIE =====
-        function getConversations(userEmail) {
-            const convs = {};
-            data.messages.forEach(msg => {
-                let other = msg.from === userEmail ? msg.to : msg.from;
-                if (!convs[other]) convs[other] = [];
-                convs[other].push(msg);
-            });
-            return convs;
+        // ============================================
+        // UI UPDATE
+        // ============================================
+        function updateUI() {
+            renderFilters();
+            renderProducts();
+            renderAdminPanel();
+            renderVendorShop();
+            renderProfileOrders();
+            updateNav();
+            updateMsgNavBadge();
+            updateNotifBadge();
         }
 
-        function getUnreadCount(userEmail) {
-            return data.messages.filter(m => m.to === userEmail && !m.read).length;
-        }
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
 
-        function markAsRead(userEmail, otherEmail) {
-            data.messages.forEach(m => {
-                if (m.to === userEmail && m.from === otherEmail && !m.read) m.read = true;
-            });
-            saveData();
-        }
-
-        function sendMessage(from, to, content) {
-            if (!content.trim()) return;
-            data.messages.push({
-                id: data.nextMsgId++,
-                from: from,
-                to: to,
-                content: content.trim(),
-                date: new Date().toLocaleString('fr-FR', { hour12: false }),
-                read: false
-            });
-            saveData();
-            renderAll();
-            if (document.getElementById('popupMessages').classList.contains('active')) {
-                renderConversations();
-                if (document.getElementById('messageThreadContainer').classList.contains('hidden') === false) {
-                    const currentConv = document.getElementById('currentConversationName').dataset.email;
-                    if (currentConv) renderThread(currentConv);
-                }
-            }
-        }
-
-        function renderConversations() {
-            const user = data.currentUser;
-            if (!user) return;
-            const convs = getConversations(user.email);
-            const container = document.getElementById('conversationList');
-            container.innerHTML = '';
-            const keys = Object.keys(convs);
-            if (keys.length === 0) {
-                container.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;font-size:0.75rem;">Aucune conversation</div>`;
-                return;
-            }
-            keys.forEach(other => {
-                const otherUser = getUserByEmail(other);
-                const name = otherUser ? otherUser.name : other;
-                const msgs = convs[other];
-                const lastMsg = msgs[msgs.length - 1];
-                const unread = msgs.filter(m => m.to === user.email && !m.read).length;
-                const div = document.createElement('div');
-                div.className = 'conversation-item';
-                div.innerHTML = `
-                    <div class="conv-info">
-                        <div class="conv-avatar">${name.charAt(0).toUpperCase()}</div>
-                        <span class="conv-name">${name}</span>
-                        <span class="conv-last">${lastMsg ? lastMsg.content.substring(0,20) + (lastMsg.content.length > 20 ? '...' : '') : ''}</span>
-                    </div>
-                    ${unread > 0 ? `<span class="conv-unread">${unread}</span>` : ''}
-                `;
-                div.addEventListener('click', () => {
-                    markAsRead(user.email, other);
-                    renderAll();
-                    openThread(other, name);
-                });
-                container.appendChild(div);
-            });
-        }
-
-        function openThread(otherEmail, otherName) {
-            const container = document.getElementById('conversationList');
-            const threadContainer = document.getElementById('messageThreadContainer');
-            container.classList.add('hidden');
-            threadContainer.classList.remove('hidden');
-            document.getElementById('currentConversationName').textContent = otherName;
-            document.getElementById('currentConversationName').dataset.email = otherEmail;
-            renderThread(otherEmail);
-        }
-
-        function renderThread(otherEmail) {
-            const user = data.currentUser;
-            if (!user) return;
-            const thread = document.getElementById('messageThread');
-            thread.innerHTML = '';
-            const msgs = data.messages.filter(m => (m.from === user.email && m.to === otherEmail) || (m.from === otherEmail && m.to === user.email));
-            msgs.sort((a, b) => new Date(a.date) - new Date(b.date));
-            if (msgs.length === 0) {
-                thread.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;">Aucun message</div>`;
-                return;
-            }
-            msgs.forEach(msg => {
-                const div = document.createElement('div');
-                div.className = `msg ${msg.from === user.email ? 'sent' : 'received'}`;
-                div.innerHTML = `
-                    <div class="msg-content">${msg.content}</div>
-                    <div class="msg-meta">${msg.date}</div>
-                `;
-                thread.appendChild(div);
-            });
-            thread.scrollTop = thread.scrollHeight;
-        }
-
-        function backToConversations() {
-            document.getElementById('conversationList').classList.remove('hidden');
-            document.getElementById('messageThreadContainer').classList.add('hidden');
-            renderConversations();
-        }
-
-        function updateMsgNavBadge() {
-            const badge = document.getElementById('msgNavBadge');
-            const user = data.currentUser;
-            if (user) {
-                const unread = getUnreadCount(user.email);
-                if (unread > 0) {
-                    badge.classList.remove('hidden');
-                    badge.textContent = unread;
-                } else {
-                    badge.classList.add('hidden');
-                }
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        // ===== ORDER MANAGEMENT =====
-        function approveOrder(orderId) {
-            const order = data.orders.find(o => o.id === orderId);
-            if (!order) return showToast('Commande introuvable', 'error');
-            if (order.status !== 'pending') return showToast('Cette commande a déjà été traitée', 'warning');
-            order.status = 'completed';
-            // Notifier l'acheteur
-            addNotification(order.buyer, 'order', `Votre commande "${order.productName}" a été acceptée et est maintenant validée.`);
-            // Notifier l'admin
-            addNotification('admin@shop.com', 'order', `La commande "${order.productName}" de ${order.buyerName} a été validée.`);
-            data.activities.unshift({
-                user: data.currentUser?.name || 'Admin',
-                action: `a validé la commande "${order.productName}" de ${order.buyerName}`,
-                time: 'À l\'instant',
-                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'A'
-            });
-            saveData();
-            renderAll();
-            showToast(`✅ Commande "${order.productName}" validée ! L'acheteur a été notifié.`);
-        }
-
-        function cancelOrder(orderId) {
-            const order = data.orders.find(o => o.id === orderId);
-            if (!order) return showToast('Commande introuvable', 'error');
-            if (order.status === 'cancelled') return showToast('Commande déjà annulée', 'warning');
-            order.status = 'cancelled';
-            // Rendre le stock
-            const product = data.products.find(p => p.id === order.productId);
-            if (product) product.stock++;
-            addNotification(order.buyer, 'order', `Votre commande "${order.productName}" a été annulée.`);
-            data.activities.unshift({
-                user: data.currentUser?.name || 'Admin',
-                action: `a annulé la commande "${order.productName}" de ${order.buyerName}`,
-                time: 'À l\'instant',
-                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'A'
-            });
-            saveData();
-            renderAll();
-            showToast(`❌ Commande "${order.productName}" annulée.`);
-        }
-
-        // ===== POPUPS / MODALS =====
-        function openPopup(type) {
-            if (type === 'admin') { document.getElementById('popupAdmin').classList.add('active'); document.body.style.overflow = 'hidden' }
-            else if (type === 'vendor') { document.getElementById('popupMyShop').classList.add('active'); document.body.style.overflow = 'hidden' }
-            else if (type === 'messages') {
-                document.getElementById('popupMessages').classList.add('active');
-                document.body.style.overflow = 'hidden';
-                renderConversations();
-                backToConversations();
-                updateMsgNavBadge();
-            } else if (type === 'notifications') {
-                document.getElementById('popupNotifications').classList.add('active');
-                document.body.style.overflow = 'hidden';
-                renderNotifications();
-                markAllNotificationsAsRead(data.currentUser.email);
-                updateNotifBadge();
-                renderAll();
-            }
-        }
-        function closePopup(type) {
-            if (type === 'admin') { document.getElementById('popupAdmin').classList.remove('active'); document.body.style.overflow = '' }
-            else if (type === 'vendor') { document.getElementById('popupMyShop').classList.remove('active'); document.body.style.overflow = '' }
-            else if (type === 'messages') { document.getElementById('popupMessages').classList.remove('active'); document.body.style.overflow = '' }
-            else if (type === 'notifications') { document.getElementById('popupNotifications').classList.remove('active'); document.body.style.overflow = '' }
-        }
-
-        function openImageZoom(src) {
-            document.getElementById('zoomImage').src = src;
-            document.getElementById('imageZoom').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        function closeImageZoom() {
-            document.getElementById('imageZoom').classList.remove('active');
-            document.body.style.overflow = '';
-            document.getElementById('zoomImage').src = '';
-        }
-        document.getElementById('imageZoom').addEventListener('click', function(e) {
-            if (e.target === this || e.target.classList.contains('zoom-close')) closeImageZoom();
-        });
-
-        // ===== RENDER =====
         function renderFilters() {
             const bar = document.getElementById('filtersBar');
             const allBtn = bar.querySelector('.filter-btn[data-filter="all"]');
             bar.innerHTML = '';
             bar.appendChild(allBtn);
             const cats = new Set();
-            data.vendors.forEach(v => { if (v.category) cats.add(v.category) });
+            state.vendors.forEach(v => { if (v.category) cats.add(v.category); });
             cats.forEach(cat => {
                 const btn = document.createElement('button');
                 btn.className = 'filter-btn';
                 btn.dataset.filter = cat;
                 const count = getProductsByFilter(cat).length;
                 btn.innerHTML = `${cat} <span class="count">${count}</span>`;
-                if (data.currentFilter === cat) btn.classList.add('active');
-                btn.addEventListener('click', () => { data.currentFilter = cat; renderAll() });
+                if (state.currentFilter === cat) btn.classList.add('active');
+                btn.addEventListener('click', () => { state.currentFilter = cat; updateUI(); });
                 bar.appendChild(btn);
             });
-            document.getElementById('allCount').textContent = data.products.length;
-        }
-
-        function renderAdminActivity() {
-            const list = document.getElementById('adminActivityList');
-            list.innerHTML = '';
-            if (data.activities.length === 0) {
-                list.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucune activité</div>`;
-                return;
-            }
-            const recent = data.activities.slice(0, 8);
-            for (let act of recent) {
-                const div = document.createElement('div');
-                div.className = 'activity-item';
-                div.innerHTML = `<div class="activity-avatar">${act.avatar || 'U'}</div><div class="activity-content"><div class="text"><strong>${act.user}</strong> ${act.action}</div><div class="time">${act.time}</div></div>`;
-                list.appendChild(div);
-            }
+            document.getElementById('allCount').textContent = state.products.length;
         }
 
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             const cards = grid.querySelectorAll('.product-card');
             cards.forEach(el => el.remove());
-            const products = getProductsByFilter(data.currentFilter);
-            document.getElementById('currentFilterLabel').textContent = getFilterLabel(data.currentFilter);
+            const products = getProductsByFilter(state.currentFilter);
+            document.getElementById('currentFilterLabel').textContent = state.currentFilter !== 'all' ? `· ${state.currentFilter}` : '';
             if (products.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
                 document.getElementById('productCount').textContent = '0';
@@ -914,22 +897,23 @@
             }
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('productCount').textContent = products.length;
-            for (let p of products) {
-                const vendor = getVendor(p.vendorId);
-                const isOwner = data.currentUser && (data.currentUser.role === 'admin' || data.currentUser.id === p.vendorId);
-                const canDelete = data.currentUser && (data.currentUser.role === 'admin' || (data.currentUser.role === 'vendor' && data.currentUser.id === p.vendorId));
+
+            for (const p of products) {
+                const vendor = getVendor(p.vendor_id);
+                const isOwner = state.currentProfile && (state.currentProfile.role === 'admin' || state.currentProfile.id === p.vendor_id);
+                const canDelete = state.currentProfile && (state.currentProfile.role === 'admin' || (state.currentProfile.role === 'vendor' && state.currentProfile.id === p.vendor_id));
                 const isInStock = p.stock > 0;
                 const imageSrc = p.image || getDefaultImage();
+                const isAdmin = state.currentProfile && state.currentProfile.role === 'admin';
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
                     <div class="image" data-img="${imageSrc}"><img src="${imageSrc}" alt="${p.name}" loading="lazy" /><span class="vendor-badge"><i class="fas fa-store"></i> ${vendor ? vendor.name : 'Admin'}</span><span class="stock-badge ${isInStock ? 'in-stock' : 'out-stock'}">${isInStock ? '✅ ' + p.stock : '❌ Rupture'}</span></div>
-                    <div class="body"><div class="name">${p.name}</div><div class="price">${p.price.toFixed(2)} <small>€</small></div><div class="desc">${p.desc || 'Aucune description'}</div><div class="rating"><span class="stars">${renderStars(p.rating || 4.5)}</span><span>(${p.reviews || 0} avis)</span></div>
+                    <div class="body"><div class="name">${p.name}</div><div class="price">${(p.price || 0).toFixed(2)} <small>€</small></div><div class="desc">${p.description || 'Aucune description'}</div><div class="rating"><span class="stars">${renderStars(p.rating || 4.5)}</span><span>(${p.reviews || 0} avis)</span></div>
                     <div class="actions">
-                        ${isInStock ? `<button class="btn btn-primary btn-sm buy-btn" data-id="${p.id}"><i class="fas fa-shopping-cart"></i></button>` : `<button class="btn btn-outline btn-sm" disabled><i class="fas fa-times"></i></button>`}
-                        <button class="btn btn-warning btn-sm review-btn" data-id="${p.id}"><i class="fas fa-star"></i></button>
-                        ${vendor ? `<button class="btn btn-primary btn-sm msg-btn" data-vendor="${vendor.email}" data-product="${p.name}"><i class="fas fa-envelope"></i></button>` : ''}
-                        ${data.currentUser && data.currentUser.role === 'admin' ? `<button class="btn btn-primary btn-sm msg-btn" data-vendor="admin@shop.com" data-product="${p.name}"><i class="fas fa-envelope"></i></button>` : ''}
+                        ${!isAdmin && isInStock ? `<button class="btn btn-primary btn-sm buy-btn" data-id="${p.id}"><i class="fas fa-shopping-cart"></i></button>` : ''}
+                        ${!isAdmin ? `<button class="btn btn-warning btn-sm review-btn" data-id="${p.id}"><i class="fas fa-star"></i></button>` : ''}
+                        ${!isAdmin && vendor ? `<button class="btn btn-primary btn-sm msg-btn" data-vendor-email="${vendor.email}" data-product="${p.name}"><i class="fas fa-envelope"></i></button>` : ''}
                         ${canDelete ? `<button class="btn btn-danger btn-sm del-product" data-id="${p.id}"><i class="fas fa-trash"></i></button>` : ''}
                         ${canDelete ? `<button class="btn btn-primary btn-sm edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>` : ''}
                     </div>
@@ -938,77 +922,92 @@
                 `;
                 grid.appendChild(card);
             }
+
+            // Événements
             document.querySelectorAll('.product-card .image').forEach(el => {
                 el.addEventListener('click', function() {
                     const img = this.querySelector('img');
                     if (img) openImageZoom(img.src);
                 });
             });
+
             document.querySelectorAll('.buy-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    buyProduct(parseInt(this.dataset.id));
+                    buyProduct(this.dataset.id);
                 });
             });
+
             document.querySelectorAll('.review-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    openReviewModal(parseInt(this.dataset.id));
+                    openReviewModal(this.dataset.id);
                 });
             });
+
             document.querySelectorAll('.msg-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    if (!data.currentUser) {
+                    if (!state.currentProfile) {
                         showToast('Connectez-vous pour envoyer un message.', 'error');
                         openAuthModal();
                         return;
                     }
-                    const vendorEmail = this.dataset.vendor;
-                    const productName = this.dataset.product;
-                    if (vendorEmail === data.currentUser.email) {
+                    const receiverEmail = this.dataset.vendorEmail;
+                    if (receiverEmail === state.currentProfile.email) {
                         showToast('Vous ne pouvez pas vous envoyer un message à vous-même.', 'warning');
                         return;
                     }
                     openPopup('messages');
-                    const otherUser = getUserByEmail(vendorEmail);
-                    const name = otherUser ? otherUser.name : vendorEmail;
+                    const vendor = state.vendors.find(v => v.email === receiverEmail);
+                    const name = vendor ? vendor.name : receiverEmail;
                     setTimeout(() => {
-                        markAsRead(data.currentUser.email, vendorEmail);
-                        renderAll();
-                        openThread(vendorEmail, name);
+                        openThread(receiverEmail, name);
                     }, 100);
                 });
             });
+
             document.querySelectorAll('.del-product').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    if (confirm('Supprimer ce produit ?')) deleteProduct(parseInt(this.dataset.id));
+                    if (confirm('Supprimer ce produit ?')) deleteProduct(this.dataset.id);
                 });
             });
+
             document.querySelectorAll('.edit-product').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    openEditModal(parseInt(this.dataset.id));
+                    openEditModal(this.dataset.id);
                 });
             });
         }
 
         function renderAdminPanel() {
-            document.getElementById('statProducts').textContent = data.products.length;
-            document.getElementById('statVendors').textContent = data.vendors.length;
-            document.getElementById('statOrders').textContent = data.orders.length;
-            const revenue = data.orders.reduce((sum, o) => sum + o.price, 0);
+            document.getElementById('statProducts').textContent = state.products.length;
+            document.getElementById('statVendors').textContent = state.vendors.length;
+            document.getElementById('statOrders').textContent = state.orders.length;
+            const revenue = state.orders.reduce((sum, o) => sum + (o.price || 0), 0);
             document.getElementById('statRevenue').textContent = revenue.toFixed(2) + ' €';
 
-            renderAdminActivity();
+            const list = document.getElementById('adminActivityList');
+            list.innerHTML = '';
+            if (state.activities.length === 0) {
+                list.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucune activité</div>`;
+            } else {
+                for (const act of state.activities) {
+                    const div = document.createElement('div');
+                    div.className = 'activity-item';
+                    div.innerHTML = `<div class="activity-avatar">${act.avatar || 'U'}</div><div class="activity-content"><div class="text"><strong>${act.user_name}</strong> ${act.action}</div><div class="time">${new Date(act.time).toLocaleString('fr-FR')}</div></div>`;
+                    list.appendChild(div);
+                }
+            }
 
             const vendorList = document.getElementById('vendorList');
             vendorList.innerHTML = '';
-            if (data.vendors.length === 0) {
+            if (state.vendors.length === 0) {
                 vendorList.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucun vendeur</div>`;
             } else {
-                for (let v of data.vendors) {
+                for (const v of state.vendors) {
                     const stats = getVendorStats(v.id);
                     const div = document.createElement('div');
                     div.className = 'vendor-card';
@@ -1024,31 +1023,24 @@
                             <span><i class="fas fa-star" style="color:var(--orange);"></i> ${v.rating || 0}</span>
                             <span><i class="fas fa-box"></i> ${stats.products}</span>
                             <span><i class="fas fa-euro-sign"></i> ${stats.revenue.toFixed(0)}</span>
-                            <button class="btn btn-danger btn-sm remove-vendor" data-id="${v.id}"><i class="fas fa-user-minus"></i></button>
                         </div>
                     `;
                     vendorList.appendChild(div);
                 }
-                document.querySelectorAll('.remove-vendor').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = parseInt(this.dataset.id);
-                        if (confirm('Retirer ce vendeur ?')) removeVendor(id);
-                    });
-                });
             }
 
             const adminProductList = document.getElementById('adminProductList');
             adminProductList.innerHTML = '';
-            if (data.products.length === 0) {
+            if (state.products.length === 0) {
                 adminProductList.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucun produit</div>`;
             } else {
-                for (let p of data.products) {
-                    const vendor = getVendor(p.vendorId);
+                for (const p of state.products) {
+                    const vendor = getVendor(p.vendor_id);
                     const div = document.createElement('div');
                     div.className = 'product-preview';
                     div.innerHTML = `
                         <img src="${p.image || getDefaultImage()}" alt="${p.name}" onerror="this.src='${getDefaultImage()}'">
-                        <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${p.price.toFixed(2)} €</div></div>
+                        <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${(p.price || 0).toFixed(2)} €</div></div>
                         <span class="tag ${p.stock > 0 ? 'vendor' : 'out-stock'}">📦 ${p.stock}</span>
                         <span style="font-size:0.6rem;color:var(--gray-400);">${vendor ? vendor.name : 'Admin'}</span>
                         <div>
@@ -1060,33 +1052,32 @@
                 }
                 document.querySelectorAll('.del-product-admin').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        if (confirm('Supprimer ce produit ?')) deleteProduct(parseInt(this.dataset.id));
+                        if (confirm('Supprimer ce produit ?')) deleteProduct(this.dataset.id);
                     });
                 });
                 document.querySelectorAll('.edit-product-admin').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        openEditModal(parseInt(this.dataset.id));
+                        openEditModal(this.dataset.id);
                     });
                 });
             }
 
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
-            if (data.orders.length === 0) {
+            if (state.orders.length === 0) {
                 historyList.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucune commande</div>`;
             } else {
-                const sorted = [...data.orders].sort((a, b) => new Date(b.date) - new Date(a.date));
-                for (let o of sorted) {
-                    const vendor = getVendor(o.vendorId);
+                for (const o of state.orders) {
+                    const vendor = getVendor(o.vendor_id);
                     const div = document.createElement('div');
                     div.className = 'history-item';
                     div.innerHTML = `
                         <div class="details">
-                            <strong>${o.productName}</strong>
-                            <span style="font-weight:700;color:var(--primary);">${o.price.toFixed(2)} €</span>
-                            <span class="date">${o.date}</span>
+                            <strong>${o.product_name}</strong>
+                            <span style="font-weight:700;color:var(--primary);">${(o.price || 0).toFixed(2)} €</span>
+                            <span class="date">${new Date(o.date).toLocaleString('fr-FR')}</span>
                             ${vendor ? `<span style="font-size:0.6rem;color:var(--gray-400);">🏪 ${vendor.name}</span>` : ''}
-                            <span class="buyer-info"><i class="fas fa-user"></i> ${o.buyerName || o.buyer} <i class="fas fa-phone"></i> ${o.buyerPhone || 'N/C'} <i class="fas fa-map-marker-alt"></i> ${o.buyerAddress || 'N/C'}</span>
+                            <span class="buyer-info"><i class="fas fa-user"></i> ${o.buyer_name || o.buyer_email} <i class="fas fa-phone"></i> ${o.buyer_phone || 'N/C'} <i class="fas fa-map-marker-alt"></i> ${o.buyer_address || 'N/C'}</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:0.3rem;">
                             <span class="status-badge ${o.status}">${getOrderStatusLabel(o.status)}</span>
@@ -1100,21 +1091,21 @@
                 }
                 document.querySelectorAll('.approve-order').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        approveOrder(parseInt(this.dataset.id));
+                        approveOrder(this.dataset.id);
                     });
                 });
                 document.querySelectorAll('.cancel-order').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        if (confirm('Annuler cette commande ?')) cancelOrder(parseInt(this.dataset.id));
+                        if (confirm('Annuler cette commande ?')) cancelOrder(this.dataset.id);
                     });
                 });
             }
         }
 
         function renderVendorShop() {
-            const user = data.currentUser;
+            const user = state.currentProfile;
             if (!user || user.role !== 'vendor') return;
-            const vendor = data.vendors.find(v => v.id === user.id);
+            const vendor = state.vendors.find(v => v.id === user.id);
             if (!vendor) return;
             document.getElementById('myShopName').textContent = `· ${vendor.name} (${vendor.category || 'Général'}) ⭐ ${vendor.rating || 0}`;
             const stats = getVendorStats(user.id);
@@ -1128,12 +1119,12 @@
             if (prods.length === 0) {
                 list.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucun produit publié</div>`;
             } else {
-                for (let p of prods) {
+                for (const p of prods) {
                     const div = document.createElement('div');
                     div.className = 'product-preview';
                     div.innerHTML = `
                         <img src="${p.image || getDefaultImage()}" alt="${p.name}" onerror="this.src='${getDefaultImage()}'">
-                        <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${p.price.toFixed(2)} €</div></div>
+                        <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${(p.price || 0).toFixed(2)} €</div></div>
                         <span class="tag ${p.stock > 0 ? 'vendor' : 'out-stock'}">📦 ${p.stock}</span>
                         <span style="font-size:0.6rem;color:var(--gray-400);">⭐ ${p.rating || 0}</span>
                         <div>
@@ -1145,36 +1136,35 @@
                 }
                 document.querySelectorAll('.del-product-vendor').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        if (confirm('Supprimer ce produit ?')) deleteProduct(parseInt(this.dataset.id));
+                        if (confirm('Supprimer ce produit ?')) deleteProduct(this.dataset.id);
                     });
                 });
                 document.querySelectorAll('.edit-product-vendor').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        openEditModal(parseInt(this.dataset.id));
+                        openEditModal(this.dataset.id);
                     });
                 });
             }
 
             const ordersList = document.getElementById('vendorOrdersList');
             ordersList.innerHTML = '';
-            const vendorOrders = data.orders.filter(o => o.vendorId === user.id);
+            const vendorOrders = state.orders.filter(o => o.vendor_id === user.id);
             if (vendorOrders.length === 0) {
                 ordersList.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.4rem;font-size:0.75rem;">Aucune commande reçue</div>`;
             } else {
-                const sorted = [...vendorOrders].sort((a, b) => new Date(b.date) - new Date(a.date));
-                for (let o of sorted) {
+                for (const o of vendorOrders) {
                     const div = document.createElement('div');
                     div.className = 'history-item';
                     div.innerHTML = `
                         <div class="details">
-                            <strong>${o.productName}</strong>
-                            <span style="font-weight:700;color:var(--primary);">${o.price.toFixed(2)} €</span>
-                            <span class="date">${o.date}</span>
+                            <strong>${o.product_name}</strong>
+                            <span style="font-weight:700;color:var(--primary);">${(o.price || 0).toFixed(2)} €</span>
+                            <span class="date">${new Date(o.date).toLocaleString('fr-FR')}</span>
                             <div class="buyer-info" style="width:100%;margin-top:0.1rem;font-size:0.65rem;background:var(--gray-50);padding:0.2rem 0.4rem;border-radius:6px;">
-                                <i class="fas fa-user"></i> <strong>${o.buyerName || o.buyer}</strong>
-                                <i class="fas fa-phone"></i> ${o.buyerPhone || 'Non renseigné'}
-                                <i class="fas fa-map-marker-alt"></i> ${o.buyerAddress || 'Non renseignée'}
-                                ${o.paymentMethod === 'card' ? '💳 Carte' : '💵 Espèces'}
+                                <i class="fas fa-user"></i> <strong>${o.buyer_name || o.buyer_email}</strong>
+                                <i class="fas fa-phone"></i> ${o.buyer_phone || 'Non renseigné'}
+                                <i class="fas fa-map-marker-alt"></i> ${o.buyer_address || 'Non renseignée'}
+                                ${o.payment_method === 'card' ? '💳 Carte' : '💵 Espèces'}
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;gap:0.3rem;">
@@ -1189,12 +1179,12 @@
                 }
                 document.querySelectorAll('.vendor-approve').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        approveOrder(parseInt(this.dataset.id));
+                        approveOrder(this.dataset.id);
                     });
                 });
                 document.querySelectorAll('.vendor-cancel').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        if (confirm('Refuser cette commande ?')) cancelOrder(parseInt(this.dataset.id));
+                        if (confirm('Refuser cette commande ?')) cancelOrder(this.dataset.id);
                     });
                 });
             }
@@ -1203,28 +1193,27 @@
         function renderProfileOrders() {
             const container = document.getElementById('profileOrderHistory');
             container.innerHTML = '';
-            const user = data.currentUser;
+            const user = state.currentProfile;
             if (!user) return;
-            const userOrders = data.orders.filter(o => o.buyer === user.email);
+            const userOrders = state.orders.filter(o => o.buyer_email === user.email);
             if (userOrders.length === 0) {
                 container.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:0.3rem;font-size:0.7rem;">Aucun achat effectué</div>`;
                 return;
             }
-            const sorted = [...userOrders].sort((a, b) => new Date(b.date) - new Date(a.date));
-            for (let o of sorted) {
-                const vendor = getVendor(o.vendorId);
+            for (const o of userOrders) {
+                const vendor = getVendor(o.vendor_id);
                 const div = document.createElement('div');
                 div.className = 'order-history-item';
                 div.innerHTML = `
                     <div class="oh-top">
-                        <span class="oh-product">${o.productName}</span>
-                        <span class="oh-price">${o.price.toFixed(2)} €</span>
+                        <span class="oh-product">${o.product_name}</span>
+                        <span class="oh-price">${(o.price || 0).toFixed(2)} €</span>
                     </div>
                     <div class="oh-bottom">
                         <span><i class="fas fa-store"></i> ${vendor ? vendor.name : 'SHOPPRO'}</span>
-                        <span><i class="fas fa-calendar"></i> ${o.date}</span>
+                        <span><i class="fas fa-calendar"></i> ${new Date(o.date).toLocaleString('fr-FR')}</span>
                         <span class="status-badge ${o.status}">${getOrderStatusLabel(o.status)}</span>
-                        <span><i class="fas fa-credit-card"></i> ${o.paymentMethod === 'card' ? 'Carte' : 'Espèces'}</span>
+                        <span><i class="fas fa-credit-card"></i> ${o.payment_method === 'card' ? 'Carte' : 'Espèces'}</span>
                         ${o.status === 'completed' ? '<span style="color:var(--green);"><i class="fas fa-check-circle"></i> Livrée</span>' : ''}
                         ${o.status === 'pending' ? '<span style="color:var(--orange);"><i class="fas fa-clock"></i> En attente de validation</span>' : ''}
                         ${o.status === 'cancelled' ? '<span style="color:var(--red);"><i class="fas fa-times-circle"></i> Annulée</span>' : ''}
@@ -1234,21 +1223,8 @@
             }
         }
 
-        function renderAll() {
-            renderFilters();
-            renderProducts();
-            renderAdminPanel();
-            renderVendorShop();
-            renderProfileOrders();
-            updateNav();
-            updateMsgNavBadge();
-            updateNotifBadge();
-            saveData();
-        }
-
-        // ===== NAV =====
         function updateNav() {
-            const user = data.currentUser;
+            const user = state.currentProfile;
             const userNameEl = document.getElementById('userName');
             const userAvatarEl = document.getElementById('userAvatar');
             const roleBadgeEl = document.getElementById('roleBadge');
@@ -1298,82 +1274,353 @@
             }
         }
 
-        // ===== PRODUCT CRUD =====
-        async function addProduct(vendorId, name, price, stock, desc, imageFile) {
-            const id = data.nextId || (data.products.length ? Math.max(...data.products.map(p => p.id)) + 1 : 1);
-            data.nextId = id + 1;
-            let imageData = '';
-            if (imageFile) {
-                try { imageData = await fileToBase64(imageFile) } catch(e) { console.error('Erreur lecture image:', e) }
-            }
-            const vendor = getVendor(vendorId);
-            const vendorName = vendor ? vendor.name : 'Admin';
-            data.products.push({
-                id,
-                vendorId,
-                name: name.trim(),
-                price: parseFloat(price),
-                stock: parseInt(stock) || 0,
-                desc: desc.trim() || '',
-                image: imageData || '',
-                rating: 0,
-                reviews: 0
+        // ============================================
+        // MESSAGERIE
+        // ============================================
+        function getConversations(userEmail) {
+            const convs = {};
+            state.messages.forEach(msg => {
+                let other = msg.sender_email === userEmail ? msg.receiver_email : msg.sender_email;
+                if (!convs[other]) convs[other] = [];
+                convs[other].push(msg);
             });
-            data.activities.unshift({
-                user: vendorName,
-                action: `a ajouté le produit "${name}" (${stock} en stock)`,
-                time: 'À l\'instant',
-                avatar: vendorName.charAt(0).toUpperCase()
-            });
-            renderAll();
-            showToast(`✅ Produit "${name}" ajouté !`);
+            return convs;
         }
 
-        function deleteProduct(id) {
-            const product = data.products.find(p => p.id === id);
-            data.products = data.products.filter(p => p.id !== id);
-            if (product) {
-                data.activities.unshift({
-                    user: data.currentUser?.name || 'Utilisateur',
-                    action: `a supprimé le produit "${product.name}"`,
-                    time: 'À l\'instant',
-                    avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'U'
-                });
+        function getUnreadCount(userEmail) {
+            return state.messages.filter(m => m.receiver_email === userEmail && !m.read).length;
+        }
+
+        function renderConversations() {
+            const user = state.currentProfile;
+            if (!user) return;
+            const convs = getConversations(user.email);
+            const container = document.getElementById('conversationList');
+            container.innerHTML = '';
+            const keys = Object.keys(convs);
+            if (keys.length === 0) {
+                container.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;font-size:0.75rem;">Aucune conversation</div>`;
+                return;
             }
-            renderAll();
-            showToast('🗑️ Produit supprimé');
+            keys.forEach(other => {
+                const vendor = state.vendors.find(v => v.email === other);
+                const name = vendor ? vendor.name : other;
+                const msgs = convs[other];
+                const lastMsg = msgs[msgs.length - 1];
+                const unread = msgs.filter(m => m.receiver_email === user.email && !m.read).length;
+                const div = document.createElement('div');
+                div.className = 'conversation-item';
+                div.innerHTML = `
+                    <div class="conv-info">
+                        <div class="conv-avatar">${name.charAt(0).toUpperCase()}</div>
+                        <span class="conv-name">${name}</span>
+                        <span class="conv-last">${lastMsg ? lastMsg.content.substring(0,20) + (lastMsg.content.length > 20 ? '...' : '') : ''}</span>
+                    </div>
+                    ${unread > 0 ? `<span class="conv-unread">${unread}</span>` : ''}
+                `;
+                div.addEventListener('click', () => {
+                    markMessagesAsRead(user.email, other);
+                    loadUserData(user.email);
+                    openThread(other, name);
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function openThread(otherEmail, otherName) {
+            const container = document.getElementById('conversationList');
+            const threadContainer = document.getElementById('messageThreadContainer');
+            container.classList.add('hidden');
+            threadContainer.classList.remove('hidden');
+            document.getElementById('currentConversationName').textContent = otherName;
+            document.getElementById('currentConversationName').dataset.email = otherEmail;
+            renderThread(otherEmail);
+        }
+
+        function renderThread(otherEmail) {
+            const user = state.currentProfile;
+            if (!user) return;
+            const thread = document.getElementById('messageThread');
+            thread.innerHTML = '';
+            const msgs = state.messages.filter(m =>
+                (m.sender_email === user.email && m.receiver_email === otherEmail) ||
+                (m.sender_email === otherEmail && m.receiver_email === user.email)
+            );
+            msgs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (msgs.length === 0) {
+                thread.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;">Aucun message</div>`;
+                return;
+            }
+            msgs.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `msg ${msg.sender_email === user.email ? 'sent' : 'received'}`;
+                const date = new Date(msg.date).toLocaleString('fr-FR', { hour12: false });
+                div.innerHTML = `
+                    <div class="msg-content">${msg.content}</div>
+                    <div class="msg-meta">${date}</div>
+                `;
+                thread.appendChild(div);
+            });
+            thread.scrollTop = thread.scrollHeight;
+        }
+
+        function backToConversations() {
+            document.getElementById('conversationList').classList.remove('hidden');
+            document.getElementById('messageThreadContainer').classList.add('hidden');
+            const user = state.currentProfile;
+            if (user) loadUserData(user.email);
+            renderConversations();
+        }
+
+        function updateMsgNavBadge() {
+            const badge = document.getElementById('msgNavBadge');
+            const user = state.currentProfile;
+            if (user) {
+                const unread = getUnreadCount(user.email);
+                if (unread > 0) {
+                    badge.classList.remove('hidden');
+                    badge.textContent = unread;
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // ============================================
+        // NOTIFICATIONS
+        // ============================================
+        function renderNotifications() {
+            const user = state.currentProfile;
+            if (!user) return;
+            const list = document.getElementById('notificationsList');
+            list.innerHTML = '';
+            const notifs = state.notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (notifs.length === 0) {
+                list.innerHTML = `<div style="text-align:center;color:var(--gray-400);padding:1rem;font-size:0.75rem;">Aucune notification</div>`;
+                return;
+            }
+            notifs.forEach(n => {
+                const div = document.createElement('div');
+                div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+                const date = new Date(n.date).toLocaleString('fr-FR', { hour12: false });
+                div.innerHTML = `
+                    <span class="notif-icon"><i class="fas ${n.type === 'order' ? 'fa-shopping-cart' : 'fa-info-circle'}"></i></span>
+                    <span>${n.message}</span>
+                    <span class="notif-time">${date}</span>
+                    ${!n.read ? `
+                        <button class="btn btn-sm btn-primary" data-id="${n.id}">Marquer lu</button>
+                        ${n.type === 'order' ? `<button class="msg-notif-btn" data-email="${n.user_email}" data-product="${n.message.match(/"(.*?)"/)?.[1] || ''}"><i class="fas fa-envelope"></i> Msg</button>` : ''}
+                    ` : ''}
+                `;
+                list.appendChild(div);
+            });
+
+            // Boutons "Msg" dans les notifications
+            document.querySelectorAll('#notificationsList .msg-notif-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const userEmail = this.dataset.email;
+                    const productName = this.dataset.product;
+                    if (!state.currentProfile) {
+                        showToast('Connectez-vous pour envoyer un message.', 'error');
+                        openAuthModal();
+                        return;
+                    }
+                    // Trouver le vendeur ou admin
+                    const vendor = state.vendors.find(v => v.email === userEmail);
+                    const admin = state.vendors.find(v => v.id === '1');
+                    let targetEmail = userEmail;
+                    let targetName = vendor ? vendor.name : userEmail;
+                    if (!vendor && userEmail === 'admin@shop.com') {
+                        targetName = 'Admin';
+                    }
+                    if (targetEmail === state.currentProfile.email) {
+                        showToast('Vous ne pouvez pas vous envoyer un message à vous-même.', 'warning');
+                        return;
+                    }
+                    openPopup('messages');
+                    setTimeout(() => {
+                        openThread(targetEmail, targetName);
+                    }, 100);
+                });
+            });
+
+            document.querySelectorAll('#notificationsList .btn-primary').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    await markNotificationAsRead(this.dataset.id);
+                    const user = state.currentProfile;
+                    if (user) await loadUserData(user.email);
+                    updateUI();
+                    renderNotifications();
+                });
+            });
+        }
+
+        function updateNotifBadge() {
+            const badge = document.getElementById('notifNavBadge');
+            const user = state.currentProfile;
+            if (user) {
+                const unread = state.notifications.filter(n => !n.read).length;
+                if (unread > 0) {
+                    badge.classList.remove('hidden');
+                    badge.textContent = unread;
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // ============================================
+        // ORDER MANAGEMENT
+        // ============================================
+        async function approveOrder(orderId) {
+            const order = state.orders.find(o => o.id === orderId);
+            if (!order) return showToast('Commande introuvable', 'error');
+            if (order.status !== 'pending') return showToast('Cette commande a déjà été traitée', 'warning');
+            try {
+                await updateOrderStatus(orderId, 'completed');
+                order.status = 'completed';
+                if (state.currentProfile) {
+                    await addNotification(order.buyer_email, 'order', `Votre commande "${order.product_name}" a été acceptée.`);
+                }
+                await addActivity(
+                    state.currentProfile?.name || 'Admin',
+                    `a validé la commande "${order.product_name}"`,
+                    state.currentProfile?.name?.charAt(0).toUpperCase() || 'A'
+                );
+                await loadAllData();
+                updateUI();
+                showToast(`✅ Commande "${order.product_name}" validée !`);
+            } catch (error) {
+                showToast('Erreur lors de la validation', 'error');
+            }
+        }
+
+        async function cancelOrder(orderId) {
+            const order = state.orders.find(o => o.id === orderId);
+            if (!order) return showToast('Commande introuvable', 'error');
+            if (order.status === 'cancelled') return showToast('Commande déjà annulée', 'warning');
+            try {
+                await updateOrderStatus(orderId, 'cancelled');
+                order.status = 'cancelled';
+                const product = state.products.find(p => p.id === order.product_id);
+                if (product) product.stock++;
+                if (state.currentProfile) {
+                    await addNotification(order.buyer_email, 'order', `Votre commande "${order.product_name}" a été annulée.`);
+                }
+                await addActivity(
+                    state.currentProfile?.name || 'Admin',
+                    `a annulé la commande "${order.product_name}"`,
+                    state.currentProfile?.name?.charAt(0).toUpperCase() || 'A'
+                );
+                await loadAllData();
+                updateUI();
+                showToast(`❌ Commande "${order.product_name}" annulée.`);
+            } catch (error) {
+                showToast('Erreur lors de l\'annulation', 'error');
+            }
+        }
+
+        // ============================================
+        // PRODUCT CRUD
+        // ============================================
+        async function addProduct(vendorId, name, price, stock, desc, imageFile) {
+            try {
+                if (!vendorId) return showToast('ID du vendeur manquant.', 'error');
+                let imageData = '';
+                if (imageFile) imageData = await fileToBase64(imageFile);
+                const productData = {
+                    vendor_id: vendorId,
+                    name: name.trim(),
+                    price: parseFloat(price),
+                    stock: parseInt(stock) || 0,
+                    description: desc.trim() || '',
+                    image: imageData || '',
+                    rating: 0,
+                    reviews: 0
+                };
+                const product = await createProduct(productData);
+                state.products.push(product);
+                const vendor = getVendor(vendorId);
+                await addActivity(
+                    vendor ? vendor.name : 'Admin',
+                    `a ajouté le produit "${name}" (${stock} en stock)`,
+                    vendor ? vendor.name.charAt(0).toUpperCase() : 'A'
+                );
+                await loadAllData();
+                updateUI();
+                showToast(`✅ Produit "${name}" ajouté !`);
+            } catch (error) {
+                showToast('Erreur lors de l\'ajout du produit: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteProduct(id) {
+            try {
+                const product = state.products.find(p => p.id === id);
+                await deleteProduct(id);
+                if (product) {
+                    await addActivity(
+                        state.currentProfile?.name || 'Utilisateur',
+                        `a supprimé le produit "${product.name}"`,
+                        state.currentProfile?.name?.charAt(0).toUpperCase() || 'U'
+                    );
+                }
+                await loadAllData();
+                updateUI();
+                showToast('🗑️ Produit supprimé');
+            } catch (error) {
+                showToast('Erreur lors de la suppression', 'error');
+            }
         }
 
         async function editProduct(id, name, price, stock, desc, imageFile) {
-            const product = data.products.find(p => p.id === id);
-            if (!product) return showToast('Produit introuvable', 'error');
-            product.name = name.trim();
-            product.price = parseFloat(price);
-            product.stock = parseInt(stock) || 0;
-            product.desc = desc.trim() || '';
-            if (imageFile) {
-                try { product.image = await fileToBase64(imageFile) } catch(e) { console.error('Erreur lecture image:', e) }
+            try {
+                const product = state.products.find(p => p.id === id);
+                if (!product) return showToast('Produit introuvable', 'error');
+                const updates = {
+                    name: name.trim(),
+                    price: parseFloat(price),
+                    stock: parseInt(stock) || 0,
+                    description: desc.trim() || ''
+                };
+                if (imageFile) updates.image = await fileToBase64(imageFile);
+                await updateProduct(id, updates);
+                await addActivity(
+                    state.currentProfile?.name || 'Utilisateur',
+                    `a modifié le produit "${name}"`,
+                    state.currentProfile?.name?.charAt(0).toUpperCase() || 'U'
+                );
+                await loadAllData();
+                updateUI();
+                showToast(`✅ Produit "${name}" modifié !`);
+            } catch (error) {
+                showToast('Erreur lors de la modification', 'error');
             }
-            data.activities.unshift({
-                user: data.currentUser?.name || 'Utilisateur',
-                action: `a modifié le produit "${product.name}"`,
-                time: 'À l\'instant',
-                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'U'
-            });
-            renderAll();
-            showToast(`✅ Produit "${product.name}" modifié !`);
         }
 
-        // ===== BUY / PAYMENT =====
+        // ============================================
+        // BUY / PAYMENT (UNIQUEMENT POUR ACHETEURS)
+        // ============================================
         let pendingProductId = null;
 
         function buyProduct(productId) {
-            const product = data.products.find(p => p.id === productId);
+            const product = state.products.find(p => p.id === productId);
             if (!product) return showToast('Produit introuvable', 'error');
             if (product.stock <= 0) return showToast('Ce produit est en rupture de stock !', 'error');
-            if (!data.currentUser) {
+            if (!state.currentProfile) {
                 showToast('Veuillez vous connecter pour acheter.', 'error');
                 openAuthModal();
+                return;
+            }
+            // L'admin NE PEUT PAS acheter
+            if (state.currentProfile.role === 'admin') {
+                showToast('L\'administrateur ne peut pas acheter de produits.', 'warning');
                 return;
             }
             pendingProductId = productId;
@@ -1383,8 +1630,8 @@
             document.getElementById('cardCvv').value = '';
         }
 
-        function confirmPayment() {
-            const product = data.products.find(p => p.id === pendingProductId);
+        async function confirmPayment() {
+            const product = state.products.find(p => p.id === pendingProductId);
             if (!product) { showToast('Erreur produit', 'error'); return; }
             const method = document.querySelector('input[name="paymentMethod"]:checked');
             const methodLabel = method ? method.value : 'card';
@@ -1399,187 +1646,52 @@
                 }
             }
 
-            const buyer = data.currentUser;
-            const buyerUser = getUser(buyer.id);
-            product.stock--;
-            const order = {
-                id: data.nextOrderId || (data.orders.length ? Math.max(...data.orders.map(o => o.id)) + 1 : 101),
-                productId: product.id,
-                productName: product.name,
-                price: product.price,
-                date: new Date().toLocaleString('fr-FR', { hour12: false }),
-                buyer: buyer.email,
-                buyerName: buyer.name || buyer.email,
-                buyerAddress: buyerUser?.address || 'Non renseignée',
-                buyerPhone: buyerUser?.phone || 'Non renseigné',
-                vendorId: product.vendorId,
-                status: 'pending',
-                paymentMethod: methodLabel
-            };
-            data.nextOrderId = order.id + 1;
-            data.orders.push(order);
-            const vendor = getVendor(product.vendorId);
-            data.activities.unshift({
-                user: buyer.name || 'Client',
-                action: `a acheté "${product.name}" chez ${vendor ? vendor.name : 'SHOPPRO'} (${methodLabel === 'card' ? '💳 Carte' : '💵 Espèces'})`,
-                time: 'À l\'instant',
-                avatar: buyer.name?.charAt(0).toUpperCase() || 'C'
-            });
-            // Notification à l'acheteur
-            addNotification(buyer.email, 'order', `Votre commande "${product.name}" a été passée. En attente de validation par le vendeur.`);
-            // Notification au vendeur
-            if (vendor) {
-                addNotification(vendor.email, 'order', `Nouvelle commande de ${buyer.name} pour "${product.name}" (${product.price.toFixed(2)} €).`);
+            const buyer = state.currentProfile;
+            try {
+                const orderData = {
+                    product_id: product.id,
+                    product_name: product.name,
+                    price: product.price,
+                    date: new Date().toISOString(),
+                    buyer_email: buyer.email,
+                    buyer_name: buyer.name || buyer.email,
+                    buyer_address: buyer.address || '',
+                    buyer_phone: buyer.phone || '',
+                    vendor_id: product.vendor_id,
+                    status: 'pending',
+                    payment_method: methodLabel
+                };
+                await createOrder(orderData);
+                await updateProduct(product.id, { stock: product.stock - 1 });
+                product.stock--;
+                const vendor = getVendor(product.vendor_id);
+                await addActivity(
+                    buyer.name || 'Client',
+                    `a acheté "${product.name}" chez ${vendor ? vendor.name : 'SHOPPRO'}`,
+                    buyer.name?.charAt(0).toUpperCase() || 'C'
+                );
+                await addNotification(buyer.email, 'order', `Votre commande "${product.name}" a été passée. En attente de validation.`);
+                if (vendor) {
+                    await addNotification(vendor.email, 'order', `Nouvelle commande de ${buyer.name} pour "${product.name}" (${product.price.toFixed(2)} €).`);
+                }
+                // Admin notification
+                const admin = state.vendors.find(v => v.id === '1');
+                if (admin) {
+                    await addNotification(admin.email, 'order', `Nouvelle commande de ${buyer.name} pour "${product.name}" (${product.price.toFixed(2)} €).`);
+                }
+                document.getElementById('paymentModal').classList.remove('active');
+                pendingProductId = null;
+                await loadAllData();
+                updateUI();
+                showToast(`✅ Commande passée : ${product.name} (${product.price.toFixed(2)} €)`);
+            } catch (error) {
+                showToast('Erreur lors de la commande: ' + error.message, 'error');
             }
-            // Notification à l'admin
-            addNotification('admin@shop.com', 'order', `Nouvelle commande de ${buyer.name} pour "${product.name}" (${product.price.toFixed(2)} €).`);
-
-            document.getElementById('paymentModal').classList.remove('active');
-            pendingProductId = null;
-            renderAll();
-            showToast(`✅ Commande passée : ${product.name} (${product.price.toFixed(2)} €) - Paiement ${methodLabel === 'card' ? 'par carte' : 'en espèces à la livraison'}`);
         }
 
-        // ===== VENDOR MANAGEMENT =====
-        function inviteVendor(name, email, category) {
-            if (data.users.find(u => u.email === email)) return showToast('Cet email est déjà utilisé.', 'error');
-            const vendorId = data.users.length ? Math.max(...data.users.map(u => u.id)) + 1 : 1;
-            const tempPassword = 'vendor123';
-            data.users.push({
-                id: vendorId,
-                email: email.trim(),
-                password: tempPassword,
-                role: 'vendor',
-                name: name.trim(),
-                category: category.trim(),
-                address: '',
-                phone: ''
-            });
-            data.vendors.push({
-                id: vendorId,
-                name: name.trim(),
-                email: email.trim(),
-                category: category.trim(),
-                rating: 0,
-                reviews: 0
-            });
-            data.activities.unshift({
-                user: data.currentUser?.name || 'Admin',
-                action: `a invité "${name}" comme nouveau vendeur`,
-                time: 'À l\'instant',
-                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'A'
-            });
-            renderAll();
-            showToast(`✅ Vendeur invité : ${name} (${email}) - Mot de passe : ${tempPassword}`);
-            document.getElementById('inviteForm').reset();
-        }
-
-        function removeVendor(id) {
-            const vendor = getVendor(id);
-            data.products = data.products.filter(p => p.vendorId !== id);
-            data.vendors = data.vendors.filter(v => v.id !== id);
-            data.users = data.users.filter(u => u.id !== id);
-            if (vendor) {
-                data.activities.unshift({
-                    user: data.currentUser?.name || 'Admin',
-                    action: `a retiré le vendeur "${vendor.name}"`,
-                    time: 'À l\'instant',
-                    avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'A'
-                });
-            }
-            renderAll();
-            showToast('🗑️ Vendeur retiré');
-        }
-
-        // ===== REVIEW =====
-        let currentProductId = null;
-
-        function openReviewModal(productId) {
-            if (!data.currentUser) {
-                showToast('Veuillez vous connecter pour laisser un avis.', 'error');
-                openAuthModal();
-                return;
-            }
-            currentProductId = productId;
-            document.getElementById('reviewModal').classList.add('active');
-            document.getElementById('reviewRating').value = '5';
-            document.getElementById('reviewComment').value = '';
-        }
-
-        function closeReviewModal() {
-            document.getElementById('reviewModal').classList.remove('active');
-            currentProductId = null;
-        }
-
-        document.getElementById('reviewForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const product = data.products.find(p => p.id === currentProductId);
-            if (!product) { showToast('Produit introuvable.', 'error'); return }
-            const rating = parseInt(document.getElementById('reviewRating').value);
-            const comment = document.getElementById('reviewComment').value.trim();
-            const totalReviews = product.reviews || 0;
-            const currentRating = product.rating || 0;
-            product.rating = Math.round(((currentRating * totalReviews) + rating) / (totalReviews + 1) * 10) / 10;
-            product.reviews = totalReviews + 1;
-            const vendor = getVendor(product.vendorId);
-            if (vendor) {
-                const vTotal = vendor.reviews || 0;
-                const vRating = vendor.rating || 0;
-                vendor.rating = Math.round(((vRating * vTotal) + rating) / (vTotal + 1) * 10) / 10;
-                vendor.reviews = vTotal + 1;
-            }
-            data.activities.unshift({
-                user: data.currentUser?.name || 'Client',
-                action: `a laissé un avis (${rating}⭐) sur "${product.name}"`,
-                time: 'À l\'instant',
-                avatar: data.currentUser?.name?.charAt(0).toUpperCase() || 'C'
-            });
-            closeReviewModal();
-            renderAll();
-            showToast(`⭐ Avis enregistré ! Note: ${rating}/5`);
-        });
-        document.getElementById('reviewModal').addEventListener('click', function(e) {
-            if (e.target === this) closeReviewModal();
-        });
-
-        // ===== EDIT PRODUCT MODAL =====
-        function openEditModal(productId) {
-            const product = data.products.find(p => p.id === productId);
-            if (!product) return showToast('Produit introuvable', 'error');
-            document.getElementById('editProductId').value = product.id;
-            document.getElementById('editProdName').value = product.name;
-            document.getElementById('editProdPrice').value = product.price;
-            document.getElementById('editProdStock').value = product.stock;
-            document.getElementById('editProdDesc').value = product.desc || '';
-            document.getElementById('editProdImage').value = '';
-            document.getElementById('editProductModal').classList.add('active');
-        }
-
-        function closeEditModalFn() {
-            document.getElementById('editProductModal').classList.remove('active');
-            document.getElementById('editProductId').value = '';
-            document.getElementById('editProdImage').value = '';
-        }
-
-        document.getElementById('closeEditModal').addEventListener('click', closeEditModalFn);
-        document.getElementById('editProductModal').addEventListener('click', function(e) {
-            if (e.target === this) closeEditModalFn();
-        });
-
-        document.getElementById('editProductForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = parseInt(document.getElementById('editProductId').value);
-            const name = document.getElementById('editProdName').value.trim();
-            const price = parseFloat(document.getElementById('editProdPrice').value);
-            const stock = parseInt(document.getElementById('editProdStock').value) || 0;
-            const desc = document.getElementById('editProdDesc').value.trim();
-            const imageFile = document.getElementById('editProdImage').files[0];
-            if (!name || isNaN(price) || price < 0) return showToast('Nom et prix valide requis.', 'error');
-            await editProduct(id, name, price, stock, desc, imageFile);
-            closeEditModalFn();
-        });
-
-        // ===== AUTH =====
+        // ============================================
+        // AUTH
+        // ============================================
         let isLoginMode = true;
 
         function openAuthModal() {
@@ -1599,145 +1711,220 @@
             document.getElementById('authModal').classList.remove('active');
         }
 
-        function toggleAuthMode() {
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const address = document.getElementById('authAddress').value.trim();
+            const phone = document.getElementById('authPhone').value.trim();
+            if (!email || !password) return showToast('Veuillez remplir tous les champs.', 'error');
+
+            try {
+                if (isLoginMode) {
+                    const { user } = await signIn(email, password);
+                    const profile = await getProfile(user.id);
+                    if (!profile) {
+                        await signOut();
+                        return showToast('Profil utilisateur introuvable.', 'error');
+                    }
+                    state.currentUser = user;
+                    state.currentProfile = profile;
+                    await loadUserData(profile.email);
+                    await addActivity(profile.name || profile.email, 's\'est connecté', profile.name?.charAt(0).toUpperCase() || 'U');
+                    closeAuthModal();
+                    await loadAllData();
+                    updateUI();
+                    showToast(`👋 Bonjour ${profile.name || profile.email}!`);
+                    if (profile.role === 'admin') openPopup('admin');
+                    else if (profile.role === 'vendor') openPopup('vendor');
+                } else {
+                    const name = email.split('@')[0];
+                    const { user } = await signUp(email, password, { name });
+                    const profile = await createProfile(user.id, email, name, 'user');
+                    state.currentUser = user;
+                    state.currentProfile = profile;
+                    if (address) await updateProfile(user.id, { address });
+                    if (phone) await updateProfile(user.id, { phone });
+                    await addActivity(name, 'a créé un compte', name.charAt(0).toUpperCase());
+                    closeAuthModal();
+                    await loadAllData();
+                    updateUI();
+                    showToast(`✅ Compte créé ! Bienvenue ${name}`);
+                }
+            } catch (error) {
+                showToast(error.message || 'Erreur d\'authentification', 'error');
+            }
+        });
+
+        document.getElementById('authToggleLink').addEventListener('click', function() {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').textContent = isLoginMode ? 'Connexion' : 'Créer un compte';
             document.getElementById('authSubmitBtn').textContent = isLoginMode ? 'Se connecter' : "S'inscrire";
             document.getElementById('authToggleLink').textContent = isLoginMode ? 'Pas de compte ? Créer un compte' : 'Déjà un compte ? Se connecter';
-            if (!isLoginMode) {
-                document.getElementById('addressFields').classList.remove('hidden');
-            } else {
-                document.getElementById('addressFields').classList.add('hidden');
-            }
-        }
-
-        document.getElementById('authForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            if (!email || !password) return showToast('Veuillez remplir tous les champs.', 'error');
-
-            if (isLoginMode) {
-                const user = data.users.find(u => u.email === email && u.password === password);
-                if (!user) return showToast('Email ou mot de passe incorrect.', 'error');
-                data.currentUser = { id: user.id, email: user.email, role: user.role, name: user.name, category: user.category };
-                if (user.role === 'vendor' && !data.vendors.find(v => v.id === user.id)) {
-                    data.vendors.push({
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        category: user.category || 'Général',
-                        rating: user.rating || 0,
-                        reviews: user.reviews || 0
-                    });
-                }
-                data.activities.unshift({
-                    user: user.name || user.email,
-                    action: 's\'est connecté',
-                    time: 'À l\'instant',
-                    avatar: user.name?.charAt(0).toUpperCase() || 'U'
-                });
-                closeAuthModal();
-                renderAll();
-                showToast(`👋 Bonjour ${user.name || user.email}!`);
-                if (user.role === 'admin') openPopup('admin');
-                else if (user.role === 'vendor') openPopup('vendor');
-            } else {
-                if (data.users.find(u => u.email === email)) return showToast('Cet email est déjà utilisé.', 'error');
-                const newId = data.users.length ? Math.max(...data.users.map(u => u.id)) + 1 : 1;
-                const userName = email.split('@')[0];
-                const address = document.getElementById('authAddress').value.trim();
-                const phone = document.getElementById('authPhone').value.trim();
-                data.users.push({
-                    id: newId,
-                    email,
-                    password,
-                    role: 'user',
-                    name: userName,
-                    address: address || '',
-                    phone: phone || ''
-                });
-                data.currentUser = { id: newId, email, role: 'user', name: userName };
-                data.activities.unshift({
-                    user: userName,
-                    action: 'a créé un compte',
-                    time: 'À l\'instant',
-                    avatar: userName.charAt(0).toUpperCase()
-                });
-                closeAuthModal();
-                renderAll();
-                showToast(`✅ Compte créé ! Bienvenue ${userName}`);
-            }
+            document.getElementById('addressFields').classList.toggle('hidden');
         });
 
-        document.getElementById('authToggleLink').addEventListener('click', toggleAuthMode);
         document.getElementById('authModal').addEventListener('click', function(e) {
             if (e.target === this) closeAuthModal();
         });
 
-        // ===== LOGOUT / PROFILE =====
-        function logout() {
-            data.currentUser = null;
-            data.currentFilter = 'all';
-            closePopup('admin');
-            closePopup('vendor');
-            closePopup('messages');
-            closePopup('notifications');
-            renderAll();
-            showToast('👋 Déconnexion');
-        }
-
-        function openProfileModal() {
-            const user = data.currentUser;
-            if (!user) return;
-            document.getElementById('profileAvatar').textContent = user.name?.charAt(0).toUpperCase() || '👤';
-            document.getElementById('profileName').textContent = user.name || user.email;
-            document.getElementById('profileEmail').textContent = user.email;
-            const roleEl = document.getElementById('profileRole');
-            if (user.role === 'admin') {
-                roleEl.textContent = 'Administrateur';
-                roleEl.className = 'badge-role admin';
-            } else if (user.role === 'vendor') {
-                roleEl.textContent = `Vendeur ${user.category ? '· ' + user.category : ''}`;
-                roleEl.className = 'badge-role vendor';
-            } else {
-                roleEl.textContent = 'Utilisateur';
-                roleEl.className = 'badge-role';
+        // ============================================
+        // LOGOUT
+        // ============================================
+        async function logout() {
+            try {
+                await signOut();
+                state.currentUser = null;
+                state.currentProfile = null;
+                state.currentFilter = 'all';
+                closePopup('admin');
+                closePopup('vendor');
+                closePopup('messages');
+                closePopup('notifications');
+                await loadAllData();
+                updateUI();
+                showToast('👋 Déconnexion');
+            } catch (error) {
+                showToast('Erreur lors de la déconnexion', 'error');
             }
-            const stats = getUserStats(user.id);
-            document.getElementById('profileProducts').textContent = stats.products;
-            document.getElementById('profileOrders').textContent = stats.orders;
-            document.getElementById('profileRevenue').textContent = stats.revenue.toFixed(2) + ' €';
-            renderProfileOrders();
-            document.getElementById('profileModal').classList.add('active');
         }
 
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.remove('active');
+        // ============================================
+        // REVIEW
+        // ============================================
+        let currentProductId = null;
+
+        function openReviewModal(productId) {
+            if (!state.currentProfile) {
+                showToast('Veuillez vous connecter pour laisser un avis.', 'error');
+                openAuthModal();
+                return;
+            }
+            if (state.currentProfile.role === 'admin') {
+                showToast('L\'administrateur ne peut pas laisser d\'avis.', 'warning');
+                return;
+            }
+            currentProductId = productId;
+            document.getElementById('reviewModal').classList.add('active');
+            document.getElementById('reviewRating').value = '5';
+            document.getElementById('reviewComment').value = '';
         }
 
-        document.getElementById('authBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (data.currentUser) { logout() } else { openAuthModal() }
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const product = state.products.find(p => p.id === currentProductId);
+            if (!product) { showToast('Produit introuvable.', 'error'); return; }
+            const rating = parseInt(document.getElementById('reviewRating').value);
+            const totalReviews = product.reviews || 0;
+            const currentRating = product.rating || 0;
+            product.rating = Math.round(((currentRating * totalReviews) + rating) / (totalReviews + 1) * 10) / 10;
+            product.reviews = totalReviews + 1;
+            const vendor = getVendor(product.vendor_id);
+            if (vendor) {
+                const vTotal = vendor.reviews || 0;
+                const vRating = vendor.rating || 0;
+                vendor.rating = Math.round(((vRating * vTotal) + rating) / (vTotal + 1) * 10) / 10;
+                vendor.reviews = vTotal + 1;
+            }
+            addActivity(
+                state.currentProfile?.name || 'Client',
+                `a laissé un avis (${rating}⭐) sur "${product.name}"`,
+                state.currentProfile?.name?.charAt(0).toUpperCase() || 'C'
+            );
+            document.getElementById('reviewModal').classList.remove('active');
+            currentProductId = null;
+            updateUI();
+            showToast(`⭐ Avis enregistré ! Note: ${rating}/5`);
         });
 
-        document.getElementById('userSection').addEventListener('click', function(e) {
-            if (data.currentUser) { e.stopPropagation(); openProfileModal() }
+        // ============================================
+        // EDIT PRODUCT MODAL
+        // ============================================
+        function openEditModal(productId) {
+            const product = state.products.find(p => p.id === productId);
+            if (!product) return showToast('Produit introuvable', 'error');
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProdName').value = product.name;
+            document.getElementById('editProdPrice').value = product.price;
+            document.getElementById('editProdStock').value = product.stock;
+            document.getElementById('editProdDesc').value = product.description || '';
+            document.getElementById('editProdImage').value = '';
+            document.getElementById('editProductModal').classList.add('active');
+        }
+
+        document.getElementById('editProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editProductId').value;
+            const name = document.getElementById('editProdName').value.trim();
+            const price = parseFloat(document.getElementById('editProdPrice').value);
+            const stock = parseInt(document.getElementById('editProdStock').value) || 0;
+            const desc = document.getElementById('editProdDesc').value.trim();
+            const imageFile = document.getElementById('editProdImage').files[0];
+            if (!name || isNaN(price) || price < 0) return showToast('Nom et prix valide requis.', 'error');
+            editProduct(id, name, price, stock, desc, imageFile);
+            document.getElementById('editProductModal').classList.remove('active');
         });
 
-        document.getElementById('profileLogoutBtn').addEventListener('click', function() {
-            closeProfileModal();
-            logout();
+        document.getElementById('closeEditModal').addEventListener('click', function() {
+            document.getElementById('editProductModal').classList.remove('active');
         });
 
-        document.getElementById('profileModal').addEventListener('click', function(e) {
-            if (e.target === this) closeProfileModal();
+        // ============================================
+        // POPUPS
+        // ============================================
+        function openPopup(type) {
+            if (type === 'admin') { document.getElementById('popupAdmin').classList.add('active'); document.body.style.overflow = 'hidden'; }
+            else if (type === 'vendor') { document.getElementById('popupMyShop').classList.add('active'); document.body.style.overflow = 'hidden'; }
+            else if (type === 'messages') {
+                document.getElementById('popupMessages').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                const user = state.currentProfile;
+                if (user) loadUserData(user.email);
+                renderConversations();
+                backToConversations();
+                updateMsgNavBadge();
+            } else if (type === 'notifications') {
+                document.getElementById('popupNotifications').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                renderNotifications();
+                if (state.currentProfile) {
+                    markAllNotificationsAsRead(state.currentProfile.email);
+                    loadUserData(state.currentProfile.email);
+                }
+                updateNotifBadge();
+                updateUI();
+            }
+        }
+
+        function closePopup(type) {
+            if (type === 'admin') { document.getElementById('popupAdmin').classList.remove('active'); document.body.style.overflow = ''; }
+            else if (type === 'vendor') { document.getElementById('popupMyShop').classList.remove('active'); document.body.style.overflow = ''; }
+            else if (type === 'messages') { document.getElementById('popupMessages').classList.remove('active'); document.body.style.overflow = ''; }
+            else if (type === 'notifications') { document.getElementById('popupNotifications').classList.remove('active'); document.body.style.overflow = ''; }
+        }
+
+        function openImageZoom(src) {
+            document.getElementById('zoomImage').src = src;
+            document.getElementById('imageZoom').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageZoom() {
+            document.getElementById('imageZoom').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('zoomImage').src = '';
+        }
+
+        document.getElementById('imageZoom').addEventListener('click', function(e) {
+            if (e.target === this || e.target.classList.contains('zoom-close')) closeImageZoom();
         });
 
-        // ===== NAV EVENTS =====
+        // ============================================
+        // NAV EVENTS
+        // ============================================
         document.getElementById('navHome').addEventListener('click', function(e) {
             e.preventDefault();
-            data.currentFilter = 'all';
+            state.currentFilter = 'all';
             closePopup('admin');
             closePopup('vendor');
             closePopup('messages');
@@ -1747,12 +1934,12 @@
             document.getElementById('navMyShop').classList.remove('active');
             document.getElementById('navMessages').classList.remove('active');
             document.getElementById('navNotifications').classList.remove('active');
-            renderAll();
+            updateUI();
         });
 
         document.getElementById('navDashboard').addEventListener('click', function(e) {
             e.preventDefault();
-            if (data.currentUser?.role === 'admin') {
+            if (state.currentProfile?.role === 'admin') {
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('messages');
@@ -1763,13 +1950,13 @@
                 document.getElementById('navMyShop').classList.remove('active');
                 document.getElementById('navMessages').classList.remove('active');
                 document.getElementById('navNotifications').classList.remove('active');
-                renderAll();
+                updateUI();
             }
         });
 
         document.getElementById('navMyShop').addEventListener('click', function(e) {
             e.preventDefault();
-            if (data.currentUser?.role === 'vendor') {
+            if (state.currentProfile?.role === 'vendor') {
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('messages');
@@ -1780,13 +1967,13 @@
                 document.getElementById('navDashboard').classList.remove('active');
                 document.getElementById('navMessages').classList.remove('active');
                 document.getElementById('navNotifications').classList.remove('active');
-                renderAll();
+                updateUI();
             }
         });
 
         document.getElementById('navMessages').addEventListener('click', function(e) {
             e.preventDefault();
-            if (data.currentUser) {
+            if (state.currentProfile) {
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('notifications');
@@ -1796,13 +1983,13 @@
                 document.getElementById('navDashboard').classList.remove('active');
                 document.getElementById('navMyShop').classList.remove('active');
                 document.getElementById('navNotifications').classList.remove('active');
-                renderAll();
+                updateUI();
             }
         });
 
         document.getElementById('navNotifications').addEventListener('click', function(e) {
             e.preventDefault();
-            if (data.currentUser) {
+            if (state.currentProfile) {
                 closePopup('admin');
                 closePopup('vendor');
                 closePopup('messages');
@@ -1812,11 +1999,13 @@
                 document.getElementById('navDashboard').classList.remove('active');
                 document.getElementById('navMyShop').classList.remove('active');
                 document.getElementById('navMessages').classList.remove('active');
-                renderAll();
+                updateUI();
             }
         });
 
-        // ===== POPUP CLOSE =====
+        // ============================================
+        // POPUP CLOSE
+        // ============================================
         document.getElementById('closePopupAdmin').addEventListener('click', function() {
             closePopup('admin');
             document.getElementById('navHome').click();
@@ -1846,20 +2035,29 @@
             if (e.target === this) { closePopup('notifications'); document.getElementById('navHome').click(); }
         });
 
-        // ===== MESSAGERIE EVENTS =====
+        // ============================================
+        // MESSAGERIE EVENTS
+        // ============================================
         document.getElementById('backToConversations').addEventListener('click', function() {
             backToConversations();
         });
 
-        document.getElementById('sendMessageBtn').addEventListener('click', function() {
-            const user = data.currentUser;
+        document.getElementById('sendMessageBtn').addEventListener('click', async function() {
+            const user = state.currentProfile;
             if (!user) return showToast('Connectez-vous pour envoyer un message.', 'error');
-            const otherEmail = document.getElementById('currentConversationName').dataset.email;
-            if (!otherEmail) return;
+            const receiverEmail = document.getElementById('currentConversationName').dataset.email;
+            if (!receiverEmail) return;
             const content = document.getElementById('messageInput').value;
             if (!content.trim()) return;
-            sendMessage(user.email, otherEmail, content);
-            document.getElementById('messageInput').value = '';
+            try {
+                const msg = await sendMessage(user.email, receiverEmail, content);
+                state.messages.push(msg);
+                document.getElementById('messageInput').value = '';
+                renderThread(receiverEmail);
+                updateMsgNavBadge();
+            } catch (error) {
+                showToast('Erreur lors de l\'envoi du message.', 'error');
+            }
         });
 
         document.getElementById('messageInput').addEventListener('keypress', function(e) {
@@ -1869,63 +2067,120 @@
             }
         });
 
-        // ===== ADMIN PRODUCT FORM =====
-        document.getElementById('adminProductForm').addEventListener('submit', async function(e) {
+        // ============================================
+        // ADMIN PRODUCT FORM
+        // ============================================
+        document.getElementById('adminProductForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!data.currentUser || data.currentUser.role !== 'admin') return showToast('Vous devez être administrateur.', 'error');
+            if (!state.currentProfile || state.currentProfile.role !== 'admin') {
+                return showToast('Vous devez être administrateur.', 'error');
+            }
             const name = document.getElementById('adminProdName').value.trim();
             const price = parseFloat(document.getElementById('adminProdPrice').value);
             const stock = parseInt(document.getElementById('adminProdStock').value) || 0;
             const desc = document.getElementById('adminProdDesc').value.trim();
             const imageFile = document.getElementById('adminProdImage').files[0];
-            if (!name || isNaN(price) || price < 0) return showToast('Nom et prix valide requis.', 'error');
-            await addProduct(1, name, price, stock, desc, imageFile);
+            if (!name || isNaN(price) || price < 0) {
+                return showToast('Nom et prix valide requis.', 'error');
+            }
+            addProduct(state.currentProfile.id, name, price, stock, desc, imageFile);
             document.getElementById('adminProductForm').reset();
             document.getElementById('adminProdStock').value = '10';
-            renderAll();
         });
 
-        // ===== INVITE FORM =====
-        document.getElementById('inviteForm').addEventListener('submit', function(e) {
+        // ============================================
+        // INVITE FORM
+        // ============================================
+        document.getElementById('inviteForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            if (!data.currentUser || data.currentUser.role !== 'admin') return showToast('Seul l\'administrateur peut inviter des vendeurs.', 'error');
+            if (!state.currentProfile || state.currentProfile.role !== 'admin') {
+                return showToast('Seul l\'administrateur peut inviter des vendeurs.', 'error');
+            }
             const name = document.getElementById('vendorName').value.trim();
             const email = document.getElementById('vendorEmail').value.trim();
             const category = document.getElementById('vendorCategory').value.trim();
-            if (!name || !email || !category) return showToast('Tous les champs sont requis.', 'error');
-            inviteVendor(name, email, category);
+            if (!name || !email || !category) {
+                return showToast('Tous les champs sont requis.', 'error');
+            }
+
+            try {
+                const { data: existingProfile } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                if (existingProfile) {
+                    return showToast(`❌ L'email "${email}" est déjà utilisé.`, 'error');
+                }
+
+                const tempPassword = 'vendor123';
+                const { data: authData, error: signUpError } = await supabase.auth.signUp({
+                    email: email,
+                    password: tempPassword,
+                    options: { data: { name } }
+                });
+
+                if (signUpError) {
+                    if (signUpError.message.includes('User already registered')) {
+                        return showToast(`❌ L'email "${email}" est déjà utilisé par un compte.`, 'error');
+                    }
+                    throw signUpError;
+                }
+
+                if (!authData.user) return showToast('Erreur lors de la création du compte.', 'error');
+
+                await createProfile(authData.user.id, email, name, 'vendor', category);
+                await createVendor(authData.user.id, name, email, category);
+
+                await addActivity(
+                    state.currentProfile?.name || 'Admin',
+                    `a invité "${name}" comme nouveau vendeur`,
+                    state.currentProfile?.name?.charAt(0).toUpperCase() || 'A'
+                );
+
+                await loadAllData();
+                updateUI();
+                showToast(`✅ Vendeur invité : ${name} (${email}) - Mot de passe : ${tempPassword}`);
+                document.getElementById('inviteForm').reset();
+            } catch (error) {
+                showToast('Erreur lors de l\'invitation: ' + error.message, 'error');
+            }
         });
 
-        // ===== VENDOR PRODUCT FORM =====
-        document.getElementById('vendorProductForm').addEventListener('submit', async function(e) {
+        // ============================================
+        // VENDOR PRODUCT FORM
+        // ============================================
+        document.getElementById('vendorProductForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!data.currentUser || data.currentUser.role !== 'vendor') return showToast('Vous devez être connecté en tant que vendeur.', 'error');
+            if (!state.currentProfile || state.currentProfile.role !== 'vendor') {
+                return showToast('Vous devez être connecté en tant que vendeur.', 'error');
+            }
             const name = document.getElementById('vProdName').value.trim();
             const price = parseFloat(document.getElementById('vProdPrice').value);
             const stock = parseInt(document.getElementById('vProdStock').value) || 0;
             const desc = document.getElementById('vProdDesc').value.trim();
             const imageFile = document.getElementById('vProdImage').files[0];
-            if (!name || isNaN(price) || price < 0) return showToast('Nom et prix valide requis.', 'error');
-            await addProduct(data.currentUser.id, name, price, stock, desc, imageFile);
+            if (!name || isNaN(price) || price < 0) {
+                return showToast('Nom et prix valide requis.', 'error');
+            }
+            addProduct(state.currentProfile.id, name, price, stock, desc, imageFile);
             document.getElementById('vendorProductForm').reset();
             document.getElementById('vProdStock').value = '10';
-            renderAll();
         });
 
-        // ===== PAYMENT MODAL =====
+        // ============================================
+        // PAYMENT MODAL
+        // ============================================
         document.getElementById('confirmPaymentBtn').addEventListener('click', confirmPayment);
         document.getElementById('cancelPaymentBtn').addEventListener('click', function() {
             document.getElementById('paymentModal').classList.remove('active');
             pendingProductId = null;
         });
-        document.getElementById('paymentModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                document.getElementById('paymentModal').classList.remove('active');
-                pendingProductId = null;
-            }
-        });
 
-        // ===== CARD INPUT FORMAT =====
+        // ============================================
+        // CARD INPUT
+        // ============================================
         document.getElementById('cardNumber').addEventListener('input', function(e) {
             let val = this.value.replace(/\D/g, '');
             val = val.replace(/(.{4})/g, '$1 ').trim();
@@ -1933,27 +2188,77 @@
         });
         document.getElementById('cardExpiry').addEventListener('input', function(e) {
             let val = this.value.replace(/\D/g, '');
-            if (val.length >= 2) val = val.substring(0,2) + '/' + val.substring(2,4);
+            if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
             this.value = val;
         });
 
-        // ===== INIT =====
+        // ============================================
+        // PROFILE MODAL
+        // ============================================
+        document.getElementById('userSection').addEventListener('click', function(e) {
+            if (state.currentProfile) openProfileModal();
+        });
+
+        function openProfileModal() {
+            const user = state.currentProfile;
+            if (!user) return;
+            document.getElementById('profileAvatar').textContent = user.name?.charAt(0).toUpperCase() || '👤';
+            document.getElementById('profileName').textContent = user.name || user.email;
+            document.getElementById('profileEmail').textContent = user.email;
+            const roleEl = document.getElementById('profileRole');
+            if (user.role === 'admin') {
+                roleEl.textContent = 'Administrateur';
+                roleEl.className = 'badge-role admin';
+            } else if (user.role === 'vendor') {
+                roleEl.textContent = `Vendeur ${user.category ? '· ' + user.category : ''}`;
+                roleEl.className = 'badge-role vendor';
+            } else {
+                roleEl.textContent = 'Utilisateur';
+                roleEl.className = 'badge-role';
+            }
+            const stats = getVendorStats(user.id);
+            document.getElementById('profileProducts').textContent = stats.products;
+            document.getElementById('profileOrders').textContent = stats.orders;
+            document.getElementById('profileRevenue').textContent = stats.revenue.toFixed(2) + ' €';
+            renderProfileOrders();
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        document.getElementById('profileLogoutBtn').addEventListener('click', function() {
+            document.getElementById('profileModal').classList.remove('active');
+            logout();
+        });
+
+        document.getElementById('authBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (state.currentProfile) { logout(); } else { openAuthModal(); }
+        });
+
+        // ============================================
+        // COOKIES
+        // ============================================
+        function checkCookies() {
+            if (localStorage.getItem('cookies_accepted')) document.getElementById('cookieBanner').classList.add('hidden');
+        }
+        document.getElementById('acceptCookies').addEventListener('click', function() {
+            localStorage.setItem('cookies_accepted', 'true');
+            document.getElementById('cookieBanner').classList.add('hidden');
+            showToast('🍪 Cookies acceptés !');
+        });
+
+        // ============================================
+        // INIT
+        // ============================================
         checkCookies();
-        renderAll();
+        init();
 
-        if (data.currentUser?.role === 'admin') openPopup('admin');
-        else if (data.currentUser?.role === 'vendor') openPopup('vendor');
+        console.log('🛒 SHOPSTOIQUE · Supabase');
+        console.log('✅ Admin ne peut pas acheter');
+        console.log('✅ Bouton Msg dans notifications');
+        console.log('✅ Adresse affichée dans admin');
+        console.log('📋 Tables: profiles, vendors, products, orders, messages, notifications, activities');
 
-        console.log('🛒 SHOPPRO · Version avec messagerie et notifications !');
-        console.log('📱 Upload d\'images depuis le téléphone');
-        console.log('👑 Admin: admin@shop.com / admin123');
-        console.log('👤 Vendeur: jean@parfums.com / vendor123');
-        console.log('👤 Client: client@mail.com / client123');
-        console.log('💬 Système de messages entre acheteurs, vendeurs et admin');
-        console.log('📦 Les vendeurs et admin peuvent accepter/refuser les commandes');
-        console.log('🔔 Les clients reçoivent des notifications pour leurs commandes');
-        console.log('📋 Les acheteurs voient le statut de leurs commandes');
     })();
 </script>
 </body>
-</html>
+                </html>
